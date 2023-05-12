@@ -1,5 +1,5 @@
 from aiogram import Bot, Dispatcher, executor, types
-from aiogram.types import ReplyKeyboardMarkup
+from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 from dotenv import load_dotenv
 import os
 
@@ -15,6 +15,11 @@ main_admin.add('Каталог').add('Корзина').add('Контакты').a
 
 admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
 admin_panel.add('Добавить товар').add('Удалить товар').add('Сделать рассылку')
+
+catalog_list = InlineKeyboardMarkup(row_width=2)
+catalog_list.add(InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'),
+                 InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'),
+                 InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'))
 
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message):
@@ -33,7 +38,7 @@ async def contacts(message: types.Message):
 
 @dp.message_handler(text='Каталог')
 async def catalog(message: types.Message):
-    await message.answer(f'Каталог пуст')
+    await message.answer(f'Каталог пуст', reply_markup=catalog_list)
 
 @dp.message_handler(text='Корзина')
 async def cart(message: types.Message):
