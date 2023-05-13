@@ -1,33 +1,24 @@
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 from dotenv import load_dotenv
+
 import os
 
 load_dotenv()
 bot = Bot(os.getenv('TOKEN'))
 dp = Dispatcher(bot=bot)
 
-main = ReplyKeyboardMarkup(resize_keyboard=True)
-main.add('Каталог').add('Корзина').add('Контакты')
 
-main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
-main_admin.add('Каталог').add('Корзина').add('Контакты').add('Админ-панель')
-
-admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
-admin_panel.add('Добавить товар').add('Удалить товар').add('Сделать рассылку')
 
 catalog_list = InlineKeyboardMarkup(row_width=2)
 catalog_list.add(InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'),
                  InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'),
                  InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'))
 
-@dp.message_handler(commands=['start'])
-async def cmd_start(message: types.Message):
-    await message.answer(f'Добро пожаловать в магазин!', reply_markup=main)
 
-    if message.from_user.id == int(os.getenv('ADMIN_ID')):
-        await message.answer(f'Вы авторизовались как администратор', reply_markup=main_admin)
 
+
+# узнать id профиля
 @dp.message_handler(commands=['id'])
 async def cmd_id(message: types.Message):
     await message.answer(f'{message.from_user.id}')
@@ -51,11 +42,9 @@ async def contacts(message: types.Message):
     else:
         await message.reply('Я тебя не понимаю')
 
-@dp.message_handler()
-async def answer(message: types.Message):
-    await message.reply('Я тебя не понимаю')
 
 
 if __name__ == '__main__':
+    from handlers import dp
     executor.start_polling(dp)
 
