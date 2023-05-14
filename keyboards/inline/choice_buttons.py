@@ -58,3 +58,8 @@ main_admin.add('Каталог').add('Корзина').add('Контакты').a
 
 admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
 admin_panel.add('Добавить товар').add('Удалить товар').add('Сделать рассылку')
+
+catalog_list = InlineKeyboardMarkup(row_width=2)
+catalog_list.add(InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'),
+                 InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'),
+                 InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'))

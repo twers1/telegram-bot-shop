@@ -6,7 +6,8 @@ from aiogram import types
 from aiogram.dispatcher.filters import Command
 
 from keyboards.inline.callback_datas import buy_callback
-from keyboards.inline.choice_buttons import choice, pear_keyboard, apples_keyboard, main, main_admin
+from keyboards.inline.choice_buttons import choice, pear_keyboard, apples_keyboard, main, main_admin, admin_panel, \
+    catalog_list
 from loader import dp
 import os
 
@@ -46,6 +47,34 @@ async def cmd_start(message: types.Message):
     if message.from_user.id == int(os.getenv('ADMIN_ID')):
         await message.answer(f'Вы авторизовались как администратор', reply_markup=main_admin)
 
+# узнать id профиля
+@dp.message_handler(commands=['id'])
+async def cmd_id(message: types.Message):
+    await message.answer(f'{message.from_user.id}')
+
+@dp.message_handler(text='Контакты')
+async def contacts(message: types.Message):
+    await message.answer(f'Покупать товар у него: @123456')
+
+@dp.message_handler(text='Каталог')
+async def catalog(message: types.Message):
+    await message.answer(f'Каталог пуст', reply_markup=catalog_list)
+
+@dp.message_handler(text='Корзина')
+async def cart(message: types.Message):
+    await message.answer(f'Корзина пуста')
+
+@dp.message_handler(text="Админ-панель")
+async def contacts(message: types.Message):
+    if message.from_user.id == int(os.getenv('ADMIN_ID')):
+        await message.answer(f'Вы вошли в админ-панель', reply_markup=admin_panel)
+    else:
+        await message.reply('Я тебя не понимаю')
+
+
 @dp.message_handler()
 async def answer(message: types.Message):
     await message.reply('Я тебя не понимаю')
+
+
+
