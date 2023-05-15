@@ -64,12 +64,7 @@ async def catalog(message: types.Message):
 async def cart(message: types.Message):
     await message.answer(f'Корзина пуста')
 
-@dp.message_handler(text="Админ-панель")
-async def contacts(message: types.Message):
-    if message.from_user.id == int(os.getenv('ADMIN_ID')):
-        await message.answer(f'Вы вошли в админ-панель', reply_markup=admin_panel)
-    else:
-        await message.reply('Я тебя не понимаю')
+
 
 
 @dp.message_handler()
