@@ -1,8 +1,16 @@
 from aiogram import types, Bot
+from dotenv import load_dotenv
 from gino import Gino
 from sqlalchemy import (Column, Integer, BigInteger, String, Sequence, TIMESTAMP, Boolean, JSON)
 from sqlalchemy import sql
 from gino.schema import GinoSchemaVisitor
+
+import os
+load_dotenv()
+db_pass = Bot(os.getenv('DB_PASS'))
+db_name = Bot(os.getenv('DB_NAME'))
+db_user = Bot(os.getenv('DB_USER'))
+host = Bot(os.getenv('HOST'))
 
 db = Gino()
 
@@ -19,6 +27,7 @@ class User(db.Model):
 
 class Item(db.Model):
     __tablename__ = "items"
+    id = Column(Integer, Sequence("user_id_seq"), primary_key=True)
     name = Column(String(50))
     photo = Column(String(250))
     price = Column(Integer)
@@ -62,8 +71,23 @@ class DBCommands:
         items = await Item.query.gino.all()
         return items
 
+    async def count_user(self):
+        total = await db.func.count(User.id).gino.scalar()
+        return total
+    async def check_referral(self):
+        bot = Bot.get_current()
+        user_id = types.User.get_current().id
+        user = await self.get_user(user_id)
+        referrals = await User.query.where(User.referral == user.id).gino.all()
+        return ", ".join([
+            f"{num+1}. " + (await bot.get_chat(referral.user_id)).get_mention(as_html=True)
+            for num, referral in enumerate(referrals)
+        ])
+    async def show_items(self):
+        items = await Item.query.gino.all()
+        return items
 async def create_db():
-    await db.set_bind(f"postgresql://{DB_USER}:{db_pass}@{host}/telegramShopTest")
+    await db.set_bind(f"postgresql://{db_user}:{db_pass}@{host}/telegramShopTest")
     db.gino = GinoSchemaVisitor
     await db.gino.drop_all()
     await db.gino.create_all()
