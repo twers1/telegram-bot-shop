@@ -6,11 +6,8 @@ from sqlalchemy import sql
 from gino.schema import GinoSchemaVisitor
 
 import os
-load_dotenv()
-db_pass = Bot(os.getenv('DB_PASS'))
-db_name = Bot(os.getenv('DB_NAME'))
-db_user = Bot(os.getenv('DB_USER'))
-host = Bot(os.getenv('HOST'))
+
+from config import db_user, db_pass, host
 
 db = Gino()
 

@@ -1,6 +1,10 @@
 import logging
 
-from aiogram.types import Message, CallbackQuery
+import asyncio
+import datetime
+
+from aiogram.types import  (Message, InlineKeyboardMarkup, InlineKeyboardButton,
+                           CallbackQuery, LabeledPrice, PreCheckoutQuery)
 from aiogram import types
 
 from aiogram.dispatcher.filters import Command
@@ -10,6 +14,32 @@ from keyboards.inline.choice_buttons import choice, pear_keyboard, apples_keyboa
     catalog_list
 from loader import dp
 import os
+
+
+
+@dp.message_handler(commands=['start'])
+async def cmd_start(message: types.Message):
+    await message.answer(f'Добро пожаловать в магазин!', reply_markup=main)
+
+    if message.from_user.id == int(os.getenv('ADMIN_ID')):
+        await message.answer(f'Вы авторизовались как администратор', reply_markup=main_admin)
+
+# узнать id профиля
+@dp.message_handler(commands=['id'])
+async def cmd_id(message: types.Message):
+    await message.answer(f'{message.from_user.id}')
+
+@dp.message_handler(text='Контакты')
+async def contacts(message: types.Message):
+    await message.answer(f'Покупать товар у него: @123456')
+
+@dp.message_handler(text='Каталог')
+async def catalog(message: types.Message):
+    await message.answer(f'Каталог: ', reply_markup=catalog_list)
+
+@dp.message_handler(text='Корзина')
+async def cart(message: types.Message):
+    await message.answer(f'Корзина пуста')
 
 @dp.message_handler(Command("items"))
 async def show_items(message: Message):
@@ -39,30 +69,6 @@ async def cancel_buying(call: CallbackQuery):
     await call.answer("Вы отменили эту покупку",
                       show_alert=True)
     await call.message.edit_reply_markup()
-
-@dp.message_handler(commands=['start'])
-async def cmd_start(message: types.Message):
-    await message.answer(f'Добро пожаловать в магазин!', reply_markup=main)
-
-    if message.from_user.id == int(os.getenv('ADMIN_ID')):
-        await message.answer(f'Вы авторизовались как администратор', reply_markup=main_admin)
-
-# узнать id профиля
-@dp.message_handler(commands=['id'])
-async def cmd_id(message: types.Message):
-    await message.answer(f'{message.from_user.id}')
-
-@dp.message_handler(text='Контакты')
-async def contacts(message: types.Message):
-    await message.answer(f'Покупать товар у него: @123456')
-
-@dp.message_handler(text='Каталог')
-async def catalog(message: types.Message):
-    await message.answer(f'Каталог пуст', reply_markup=catalog_list)
-
-@dp.message_handler(text='Корзина')
-async def cart(message: types.Message):
-    await message.answer(f'Корзина пуста')
 
 
 

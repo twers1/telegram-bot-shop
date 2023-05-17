@@ -1,9 +1,10 @@
 import os
 from asyncio import sleep
+
+import self as self
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from db import item
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from sqlalchemy.orm import state
 
 from database import Item
@@ -16,18 +17,15 @@ async def contacts(message: types.Message):
     if message.from_user.id == int(os.getenv('ADMIN_ID')):
         await message.answer(f'Вы вошли в админ-панель', reply_markup=admin_panel)
 
-    else:
-        await message.reply('Я тебя не понимаю')
 
-@dp.message_handler(commands=["cancel"], state=NewItem)
-async def cancel(message: types.Message, state: FSMContext):
-    await message.answer("Вы отменили создание товара")
-    await state.reset_state()
 
-@dp.message_handler(text="Добавить товар")
-async def add_items(message: types.Message):
-    await message.answer("Введите название товара или нажмите /cancel")
+
+@dp.message_handler(text="Добавить товар", state=None)
+async def add_item(message: Message):
     await NewItem.Name.set()
+    await message.answer("Введите название товара или нажмите /cancel")
+
+
 
 @dp.message_handler(state = NewItem.Name)
 async def enter_name(message: types.Message, state: FSMContext):
@@ -76,6 +74,19 @@ async def enter_price(message: types.Message, state:FSMContext):
 
     await state.update_data(item=item)
     await NewItem.Confirm.set()
+
+@dp.message_handler(commands=["cancel"], state=NewItem)
+async def cancel(message: types.Message, state: FSMContext):
+    await message.answer("Вы отменили создание товара")
+    await state.reset_state()
+
+@dp.message_handler(text="Реквизиты банковской карты")
+async def bank_card_details(message: types.Message):
+    await message.answer("Пусто")
+
+@dp.message_handler(text="Размер предоплаты")
+async def prepayment_amount(message: types.Message):
+    await message.answer("Пусто")
 
 @dp.callback_query_handler(text_contains="change", state=NewItem.Confirm)
 async def change_price(call: types.CallbackQuery):

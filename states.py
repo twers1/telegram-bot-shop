@@ -1,4 +1,3 @@
-import db as db
 
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
@@ -12,4 +11,7 @@ class NewItem(StatesGroup):
     Photo = State()
     Price = State()
     Confirm = State()
+
+class DeleteItem(StatesGroup):
+    Delete_Item = State()
 
