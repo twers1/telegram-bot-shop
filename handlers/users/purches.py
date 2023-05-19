@@ -10,7 +10,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import Command
 
 from keyboards.inline.callback_datas import buy_callback
-from keyboards.inline.choice_buttons import choice, pear_keyboard, apples_keyboard, main, main_admin, admin_panel, \
+from keyboards.inline.choice_buttons import main, main_admin, admin_panel, \
     catalog_list
 from loader import dp
 import os
@@ -41,34 +41,34 @@ async def catalog(message: types.Message):
 async def cart(message: types.Message):
     await message.answer(f'Корзина пуста')
 
-@dp.message_handler(Command("items"))
-async def show_items(message: Message):
-    await message.answer(text="На продажу у нас есть: ..\n"
-                         "Если вам ничего не нужно - ждите отмену",
-                         reply_markup=choice)
-
-@dp.callback_query_handler(text_contains="pear")
-async def buying_pear(call: CallbackQuery):
-    await call.answer(cache_time=60)
-    callback_data = call.data
-    logging.info(f"call = {callback_data}")
-
-    await call.message.answer("Вы выбрали купить грушу. Груша всего одна. Спаасибо",
-                              reply_markup=pear_keyboard)
-
-@dp.callback_query_handler(buy_callback.filter(item_name="apple"))
-async def buying_apples(call: CallbackQuery, callback_data: dict):
-    await call.answer(cache_time=60)
-    logging.info(f"call = {callback_data}")
-    quantity = callback_data.get("quantity")
-    await call.message.answer(f"Вы выбрали купить яблоки. Яблок всего {quantity}. Спасибо!",
-                              reply_markup=apples_keyboard)
-
-@dp.callback_query_handler(text="cancel")
-async def cancel_buying(call: CallbackQuery):
-    await call.answer("Вы отменили эту покупку",
-                      show_alert=True)
-    await call.message.edit_reply_markup()
+# @dp.message_handler(Command("items"))
+# async def show_items(message: Message):
+#     await message.answer(text="На продажу у нас есть: ..\n"
+#                          "Если вам ничего не нужно - ждите отмену",
+#                          reply_markup=choice)
+#
+# @dp.callback_query_handler(text_contains="pear")
+# async def buying_pear(call: CallbackQuery):
+#     await call.answer(cache_time=60)
+#     callback_data = call.data
+#     logging.info(f"call = {callback_data}")
+#
+#     await call.message.answer("Вы выбрали купить грушу. Груша всего одна. Спаасибо",
+#                               reply_markup=pear_keyboard)
+#
+# @dp.callback_query_handler(buy_callback.filter(item_name="apple"))
+# async def buying_apples(call: CallbackQuery, callback_data: dict):
+#     await call.answer(cache_time=60)
+#     logging.info(f"call = {callback_data}")
+#     quantity = callback_data.get("quantity")
+#     await call.message.answer(f"Вы выбрали купить яблоки. Яблок всего {quantity}. Спасибо!",
+#                               reply_markup=apples_keyboard)
+#
+# @dp.callback_query_handler(text="cancel")
+# async def cancel_buying(call: CallbackQuery):
+#     await call.answer("Вы отменили эту покупку",
+#                       show_alert=True)
+#     await call.message.edit_reply_markup()
 
 
 

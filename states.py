@@ -7,11 +7,22 @@ class Puchase(StatesGroup):
     Payment = State()
 
 class NewItem(StatesGroup):
-    Name = State()
-    Photo = State()
-    Price = State()
-    Confirm = State()
+    default = State()
+    name = State()
+    photo = State()
+    price = State()
+    confirm = State()
+    cost = State()
+    code = State()
+    category = State()
+    description = State()
+    end = State()
+    apply = State()
 
 class DeleteItem(StatesGroup):
     Delete_Item = State()
+
+
+class Get_Goods_Page(StatesGroup):
+    page = State()
 
