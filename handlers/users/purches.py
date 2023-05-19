@@ -35,7 +35,7 @@ async def contacts(message: types.Message):
 
 @dp.message_handler(text='Каталог')
 async def catalog(message: types.Message):
-    await message.answer(f'Каталог: ', reply_markup=catalog_list)
+    await message.answer(f'Выберите категорию товара:  ', reply_markup=catalog_list)
 
 @dp.message_handler(text='Корзина')
 async def cart(message: types.Message):

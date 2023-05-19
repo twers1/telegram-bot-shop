@@ -5,10 +5,11 @@ from aiogram.dispatcher import FSMContext
 
 
 
-from database import Item
+
 from keyboards.inline.choice_buttons import admin_panel
 from loader import dp
 from states import NewItem, Get_Goods_Page
+from utils.db_functions import add_good_to_db
 
 
 @dp.message_handler(text="Админ-панель")
@@ -16,19 +17,20 @@ async def contacts(message: types.Message):
     if message.from_user.id == int(os.getenv('ADMIN_ID')):
         await message.answer(f'Вы вошли в админ-панель', reply_markup=admin_panel)
 
+        await Get_Goods_Page.first()
+
 
 
 
 @dp.message_handler(text="Добавить товар", state=Get_Goods_Page.page)
-async def add_item(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.edit_text("<b>Введите название товара: </b>")
+async def add_good(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.edit_text("<b>Введите название книги:</b>")
 
     await state.reset_state()
     await NewItem.first()
-
 @dp.message_handler(state = NewItem.name)
 async def get_name(message: types.Message, state: FSMContext):
-    await message.answer("<b>Введите цену товара: </b>")
+    await message.answer("<b>Введите автора книги:</b>")
 
     async with state.proxy() as data:
         data["name"] = message.text
@@ -64,7 +66,7 @@ async def get_name(message: types.Message, state: FSMContext):
     # await state.update_data(item=item)
 
 @dp.message_handler(state=NewItem.photo)
-async def get_image(message: types.Message, state:FSMContext):
+async def get_photo(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["photo"] = message.text
 
@@ -75,7 +77,7 @@ async def get_image(message: types.Message, state:FSMContext):
 
     await message.answer("<b>Товар успешно добавлен!</b>", reply_markup=admin_panel)
 
-    # await add_good_to_db(name, price, photo)
+    await add_good_to_db(name, price, photo)
     await state.reset_state()
 
     await Get_Goods_Page.first()
@@ -124,8 +126,6 @@ async def change_price(call: types.CallbackQuery):
 async def confirm(call: types.CallbackQuery, state: FSMContext):
     await call.message.edit_reply_markup()
     data = await state.get_data()
-    item: Item = data.get("item")
-    await item.create()
     await call.message.answer("Товар удачно создан")
     await state.reset_state()
 

@@ -60,6 +60,6 @@ admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
 admin_panel.add('Добавить товар').add('Удалить товар').add('Реквизиты банковской карты').add('Размер предоплаты')
 
 catalog_list = InlineKeyboardMarkup(row_width=2)
-catalog_list.add(InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'),
-                 InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'),
-                 InlineKeyboardButton(text='Какой-нибудь товар', url='https://t.me/testShopTeg_bot'))
+catalog_list.add(InlineKeyboardButton(text='Категория 1', callback_data=catalog_list),
+                 InlineKeyboardButton(text='Категория 2', url='https://t.me/testShopTeg_bot'),
+                 InlineKeyboardButton(text='Категория 3', url='https://t.me/testShopTeg_bot'))
