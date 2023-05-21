@@ -1,3 +1,4 @@
+import utils
 from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from dotenv import load_dotenv

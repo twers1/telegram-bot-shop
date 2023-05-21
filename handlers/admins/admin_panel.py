@@ -24,13 +24,13 @@ async def contacts(message: types.Message):
 
 @dp.message_handler(text="Добавить товар", state=Get_Goods_Page.page)
 async def add_good(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.edit_text("<b>Введите название книги:</b>")
+    await callback.message.edit_text("Введите название товара:")
 
     await state.reset_state()
     await NewItem.first()
 @dp.message_handler(state = NewItem.name)
 async def get_name(message: types.Message, state: FSMContext):
-    await message.answer("<b>Введите автора книги:</b>")
+    await message.answer("<b>Введите описание товара:</b>")
 
     async with state.proxy() as data:
         data["name"] = message.text
