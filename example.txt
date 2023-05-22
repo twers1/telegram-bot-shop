@@ -1,0 +1,39 @@
+ # photo = message.photo[-1].file_id
+    # data = await state.get_data()
+    # item: Item = data.get("item")
+    # item.photo = photo
+    # await message.answer_photo(
+    #     photo=photo,
+    #     caption="Название: {name}"
+    #         "\nПришлите мне цену товара или нажмите /cancel".format(name=item.name)
+    # )
+    # await NewItem.price.set()
+    # await state.update_data(item=item)
+  # FSMContextname = message.text
+    # item = Item()
+    # item.name = name
+    # await message.answer("Название: {name}"
+    #                      "\nПришлите мне фотографию товара или нажмите /cancel".format(name=name))
+    # await NewItem.photo.set()
+    # await state.update_data(item=item)
+  # data = await state.get_data()
+    # item: Item = data.get("item")
+    # try:
+    #     price = int(message.text)
+    # except ValueError:
+    #     await message.answer("Неверное значение, введите число")
+    #     return
+    #
+    # item.price = price
+    # markup = InlineKeyboardMarkup(
+    #     inline_keyboard=
+    #     [
+    #         [InlineKeyboardButton(text="Да", callback_data="confirm")],
+    #         [InlineKeyboardButton(text="Ввести заново", callback_data="change")]
+    #     ]
+    # )
+    # await message.answer(("Цена: {price}:,\n"
+    #                      "Подтверждаете? Нажмите /cancel , чтобы отменить"), reply_markup = markup)
+    #
+    # await state.update_data(item=item)
+    # await NewItem.Confirm.set()

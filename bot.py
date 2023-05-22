@@ -3,7 +3,6 @@ from aiogram import Bot, Dispatcher, executor
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from dotenv import load_dotenv
 
-
 import os
 
 from utils.connect_db import con
