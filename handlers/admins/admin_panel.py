@@ -3,10 +3,11 @@ import os
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from keyboards.inline.choice_buttons import admin_panel
+from keyboards.inline.choice_buttons import admin_panel, return_to_admin_panel
 from loader import dp
 from states import NewItem, Get_Goods_Page
-from utils.db_functions import add_good_to_db
+from utils.db_functions import add_good_to_db, remove_good_from_db
+from utils.inline_keyboards import get_all_goods_keyboard
 
 
 @dp.message_handler(text="Админ-панель")
@@ -67,11 +68,40 @@ async def get_photo(message: types.Message, state: FSMContext):
 
     await Get_Goods_Page.first()
 
+@dp.callback_query_handler(text="remove_goods")
+async def send_remove_goods(callback: types.CallbackQuery):
+    await callback.message.edit_text("<b>Нажмите на товар чтобы удалить его:</b>")
+    await callback.message.edit_reply_markup(reply_markup=await get_all_goods_keyboard("remove"))
 
-@dp.message_handler(commands=["cancel"], state=NewItem)
-async def cancel(message: types.Message, state: FSMContext):
-    await message.answer("Вы отменили создание товара")
+
+@dp.callback_query_handler(text="remove_goods", state=Get_Goods_Page.page)
+async def send_remove_goods(callback: types.CallbackQuery, state: FSMContext):
+    keyboards = await get_all_goods_keyboard("remove")
+
+    await callback.message.edit_text("<b>Нажмите на товар чтобы удалить его:</b>")
+    await callback.message.edit_reply_markup(reply_markup=keyboards[1])
+
+    async with state.proxy() as data:
+        data["keyboards"] = keyboards
+        data["page"] = 1
+
+
+@dp.callback_query_handler(text_contains="remove_good", state=Get_Goods_Page.page)
+async def remove_good(callback: types.CallbackQuery, state: FSMContext):
+    callback_data = callback.data.strip().split(":")[1:]
+    good_id = callback_data[0]
+
+    await callback.message.edit_text("<b>Товар был успешно удалён!</b>")
+    await callback.message.edit_reply_markup(reply_markup=return_to_admin_panel)
+    await remove_good_from_db(good_id)
+
     await state.reset_state()
+
+
+# @dp.message_handler(commands=["cancel"], state=NewItem)
+# async def cancel(message: types.Message, state: FSMContext):
+#     await message.answer("Вы отменили создание товара")
+#     await state.reset_state()
 
 @dp.message_handler(text="Реквизиты банковской карты")
 async def bank_card_details(message: types.Message):
@@ -82,20 +112,22 @@ async def bank_card_details(message: types.Message):
 async def prepayment_amount(message: types.Message):
     await message.answer("Пусто")
 
-
-@dp.callback_query_handler(text_contains="change", state=NewItem.confirm)
-async def change_price(call: types.CallbackQuery):
-    await call.message.edit_reply_markup()
-    await call.message.answer("Ввелите заново цену товара")
-    await NewItem.price.set()
+@dp.callback_query_handler(text="return_to_admin_panel")
+async def return_to_admin_menu(callback: types.CallbackQuery):
+    await callback.message.delete()
+    await contacts(callback.message)
 
 
-@dp.callback_query_handler(text_contains="confirm", state=NewItem.confirm)
-async def confirm(call: types.CallbackQuery, state: FSMContext):
-    await call.message.edit_reply_markup()
-    data = await state.get_data()
-    await call.message.answer("Товар удачно создан")
+@dp.callback_query_handler(text="exit_from_admin_panel", state=Get_Goods_Page.page)
+async def exit_from_admin_panel(callback: types.CallbackQuery, state: FSMContext):
+    await callback.message.delete()
+
     await state.reset_state()
+
+
+
+
+
 
 
 

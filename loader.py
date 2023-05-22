@@ -1,3 +1,5 @@
+import psycopg2
+
 from aiogram import Bot,Dispatcher, types
 import os
 

@@ -37,3 +37,16 @@
     #
     # await state.update_data(item=item)
     # await NewItem.Confirm.set()
+
+#  @dp.callback_query_handler(text_contains="change", state=NewItem.confirm)
+# async def change_price(call: types.CallbackQuery):
+#     await call.message.edit_reply_markup()
+#     await call.message.answer("Ввелите заново цену товара")
+#     await NewItem.price.set()
+
+#  @dp.callback_query_handler(text_contains="confirm", state=NewItem.confirm)
+# async def confirm(call: types.CallbackQuery, state: FSMContext):
+#     await call.message.edit_reply_markup()
+#     data = await state.get_data()
+#     await call.message.answer("Товар удачно создан")
+#     await state.reset_state()
