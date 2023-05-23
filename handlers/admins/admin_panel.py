@@ -16,6 +16,7 @@ async def contacts(message: types.Message):
         await message.answer(f'Вы вошли в админ-панель', reply_markup=admin_panel)
         await Get_Goods_Page.first()
 
+
 @dp.callback_query_handler(text="add_goods", state=Get_Goods_Page.page)
 async def add_good(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.edit_text("<b>Введите название товара: </b>")
@@ -23,7 +24,8 @@ async def add_good(callback: types.CallbackQuery, state: FSMContext):
     await state.reset_state()
     await NewItem.first()
 
-@dp.message_handler(state = NewItem.name)
+
+@dp.message_handler(state=NewItem.name)
 async def get_name(message: types.Message, state: FSMContext):
     await message.answer("<b>Введите описание товара:</b>")
 
@@ -33,7 +35,7 @@ async def get_name(message: types.Message, state: FSMContext):
     await NewItem.next()
 
 
-@dp.message_handler(state=NewItem.description) # content_types=types.ContentType.PHOTO
+@dp.message_handler(state=NewItem.description)  # content_types=types.ContentType.PHOTO
 async def get_name(message: types.Message, state: FSMContext):
     await message.answer("<b>Введите цену книги: </b>")
 
@@ -67,6 +69,7 @@ async def get_photo(message: types.Message, state: FSMContext):
     await state.reset_state()
 
     await Get_Goods_Page.first()
+
 
 @dp.callback_query_handler(text="remove_goods")
 async def send_remove_goods(callback: types.CallbackQuery):
@@ -112,6 +115,7 @@ async def bank_card_details(message: types.Message):
 async def prepayment_amount(message: types.Message):
     await message.answer("Пусто")
 
+
 @dp.callback_query_handler(text="return_to_admin_panel")
 async def return_to_admin_menu(callback: types.CallbackQuery):
     await callback.message.delete()
@@ -123,12 +127,3 @@ async def exit_from_admin_panel(callback: types.CallbackQuery, state: FSMContext
     await callback.message.delete()
 
     await state.reset_state()
-
-
-
-
-
-
-
-
-
