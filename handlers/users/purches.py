@@ -12,8 +12,7 @@ from aiogram.dispatcher.filters import Command
 
 import bot
 from keyboards.inline.callback_datas import buy_callback
-from keyboards.inline.choice_buttons import main, main_admin, admin_panel, \
-    catalog_list
+from keyboards.inline.choice_buttons import main, main_admin, admin_panel, catalog_list
 from loader import dp
 import os
 

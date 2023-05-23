@@ -24,7 +24,7 @@ async def on_shutdown(dispatcher):
     con.close()
 
 if __name__ == '__main__':
-    from handlers.admins.admin_panel import dp
-    from handlers.users.purches import dp
+    from handlers.admins import admin_panel
+    from handlers.users import purches
     executor.start_polling(dp, on_startup=on_startup, on_shutdown=on_shutdown)
 

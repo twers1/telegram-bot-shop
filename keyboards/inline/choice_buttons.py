@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 
 from keyboards.inline.callback_datas import buy_callback
 from aiogram.utils.callback_data import CallbackData
@@ -58,11 +58,11 @@ main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
 main_admin.add('Каталог').add('Корзина').add('Контакты').add('Админ-панель')
 
 admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
-admin_panel.add(InlineKeyboardButton('Добавить товар', callback_data='add_goods'))
-admin_panel.add(InlineKeyboardButton('Удалить товар', callback_data='remove_goods'))
-admin_panel.add(InlineKeyboardButton('Реквизиты банковской карты', callback_data=''))
-admin_panel.add(InlineKeyboardButton('Размер предоплаты', callback_data=''))
-admin_panel.add(InlineKeyboardButton(text="Выйти", callback_data="exit_from_admin_panel"))
+admin_panel.add(KeyboardButton('Добавить товар'))
+admin_panel.add(KeyboardButton('Удалить товар', ))
+admin_panel.add(KeyboardButton('Реквизиты банковской карты'))
+admin_panel.add(KeyboardButton('Размер предоплаты'))
+admin_panel.add(KeyboardButton(text="Выйти"))
 
 return_to_admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
 return_to_admin_panel.add(InlineKeyboardButton(text="Вернуться в меню", callback_data="return_to_admin_panel"))

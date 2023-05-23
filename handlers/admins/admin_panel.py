@@ -4,22 +4,29 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from keyboards.inline.choice_buttons import admin_panel, return_to_admin_panel
-from loader import dp
+from loader import dp, bot
 from states import NewItem, Get_Goods_Page
 from utils.db_functions import add_good_to_db, remove_good_from_db
 from utils.inline_keyboards import get_all_goods_keyboard
 
 
 @dp.message_handler(text="Админ-панель")
-async def contacts(message: types.Message):
+async def contacts(message: types.Message, state: FSMContext):
     if message.from_user.id == int(os.getenv('ADMIN_ID')):
-        await message.answer(f'Вы вошли в админ-панель', reply_markup=admin_panel)
-        await Get_Goods_Page.first()
+
+        bot_message = await bot.send_message(message.from_user.id, f'Вы вошли в админ-панель', reply_markup=admin_panel)
+        async with state.proxy() as data:
+            data["key"] = bot_message.message_id
+
+        await Get_Goods_Page.page.set()
 
 
-@dp.callback_query_handler(text="add_goods", state=Get_Goods_Page.page)
-async def add_good(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.edit_text("<b>Введите название товара: </b>")
+@dp.message_handler(text="Добавить товар", state=Get_Goods_Page.page)
+async def add_good(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        print(type(data["key"]))
+        await bot.delete_message(message_id=data["key"], chat_id=message.from_user.id)
+        await bot.send_message(message.from_user.id, "<b>Введите название товара: </b>", reply_markup=None)
 
     await state.reset_state()
     await NewItem.first()
@@ -35,12 +42,13 @@ async def get_name(message: types.Message, state: FSMContext):
     await NewItem.next()
 
 
-@dp.message_handler(state=NewItem.description)  # content_types=types.ContentType.PHOTO
+@dp.message_handler(state=NewItem.description)
 async def get_name(message: types.Message, state: FSMContext):
-    await message.answer("<b>Введите цену книги: </b>")
+    await message.answer("<b>Введите цену товара: </b>")
 
     async with state.proxy() as data:
         data["description"] = message.text
+
     await NewItem.next()
 
 
@@ -71,13 +79,13 @@ async def get_photo(message: types.Message, state: FSMContext):
     await Get_Goods_Page.first()
 
 
-@dp.callback_query_handler(text="remove_goods")
+@dp.message_handler(text="remove_goods")
 async def send_remove_goods(callback: types.CallbackQuery):
     await callback.message.edit_text("<b>Нажмите на товар чтобы удалить его:</b>")
     await callback.message.edit_reply_markup(reply_markup=await get_all_goods_keyboard("remove"))
 
 
-@dp.callback_query_handler(text="remove_goods", state=Get_Goods_Page.page)
+@dp.message_handler(text="remove_goods", state=Get_Goods_Page.page)
 async def send_remove_goods(callback: types.CallbackQuery, state: FSMContext):
     keyboards = await get_all_goods_keyboard("remove")
 
@@ -89,7 +97,7 @@ async def send_remove_goods(callback: types.CallbackQuery, state: FSMContext):
         data["page"] = 1
 
 
-@dp.callback_query_handler(text_contains="remove_good", state=Get_Goods_Page.page)
+@dp.message_handler(text_contains="remove_good", state=Get_Goods_Page.page)
 async def remove_good(callback: types.CallbackQuery, state: FSMContext):
     callback_data = callback.data.strip().split(":")[1:]
     good_id = callback_data[0]
