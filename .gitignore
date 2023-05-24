@@ -120,10 +120,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-flowershop/.env
-.env
 .venv
-env/
 venv/
 ENV/
 env.bak/
@@ -160,6 +157,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-*.env
-
 .env
+
