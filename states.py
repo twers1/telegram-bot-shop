@@ -8,9 +8,9 @@ class Puchase(StatesGroup):
 
 class NewItem(StatesGroup):
     name = State()
-    photo = State()
-    price = State()
     description = State()
+    price = State()
+    photo = State()
 
 class DeleteItem(StatesGroup):
     Delete_Item = State()

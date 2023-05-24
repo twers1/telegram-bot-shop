@@ -6,6 +6,7 @@ from utils.db_functions import get_all_goods
 get_good_callback = CallbackData("get_good", "id")
 remove_good_callback = CallbackData("remove_good", "id")
 
+
 async def get_all_goods_keyboard(mode):
     all_goods_keyboards = {}
     all_buttons = []
@@ -19,8 +20,8 @@ async def get_all_goods_keyboard(mode):
     elif mode == "remove":
         callback = remove_good_callback
 
-    for name, author, id in goods:
-        all_buttons.append(InlineKeyboardButton(text=f"{name} | {author}", callback_data=callback.new(id)))
+    for name, description, id in goods:
+        all_buttons.append(InlineKeyboardButton(text=f"{name} | {description}", callback_data=callback.new(id)))
 
     while len(all_buttons) > 1:
         keyboard = InlineKeyboardMarkup()

@@ -54,7 +54,7 @@ async def get_name(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=NewItem.price)
 async def get_name(message: types.Message, state: FSMContext):
-    await message.answer("<b>Отправьте фотографию товара: </b>")
+    await message.answer("<b>Отправьте фотографию товара(ссылку): </b>")
     async with state.proxy() as data:
         data["price"] = int(message.text) * 100
     await NewItem.next()
@@ -79,18 +79,23 @@ async def get_photo(message: types.Message, state: FSMContext):
     await Get_Goods_Page.first()
 
 
-@dp.message_handler(text="remove_goods")
-async def send_remove_goods(callback: types.CallbackQuery):
-    await callback.message.edit_text("<b>Нажмите на товар чтобы удалить его:</b>")
-    await callback.message.edit_reply_markup(reply_markup=await get_all_goods_keyboard("remove"))
+@dp.message_handler(text="Удалить товар")
+async def send_remove_goods(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        print(type(data["key"]))
+        await bot.delete_message(message_id=data["key"], chat_id=message.from_user.id)
+        await bot.send_message(message.from_user.id, "<b>Нажмите на товар чтобы удалить его:</b>", reply_markup=None)
+        await bot.edit_reply_markup(reply_markup=await get_all_goods_keyboard("remove"))
 
 
-@dp.message_handler(text="remove_goods", state=Get_Goods_Page.page)
-async def send_remove_goods(callback: types.CallbackQuery, state: FSMContext):
+
+
+@dp.message_handler(text="Удалить товар", state=Get_Goods_Page.page)
+async def send_remove_goods(message: types.Message, state: FSMContext):
     keyboards = await get_all_goods_keyboard("remove")
 
-    await callback.message.edit_text("<b>Нажмите на товар чтобы удалить его:</b>")
-    await callback.message.edit_reply_markup(reply_markup=keyboards[1])
+    await bot.message.edit_text("<b>Нажмите на товар чтобы удалить его:</b>")
+    await bot.message.edit_reply_markup(reply_markup=keyboards[1])
 
     async with state.proxy() as data:
         data["keyboards"] = keyboards
@@ -98,12 +103,12 @@ async def send_remove_goods(callback: types.CallbackQuery, state: FSMContext):
 
 
 @dp.message_handler(text_contains="remove_good", state=Get_Goods_Page.page)
-async def remove_good(callback: types.CallbackQuery, state: FSMContext):
-    callback_data = callback.data.strip().split(":")[1:]
+async def remove_good(message: types.Message, state: FSMContext):
+    callback_data = bot.data.strip().split(":")[1:]
     good_id = callback_data[0]
 
-    await callback.message.edit_text("<b>Товар был успешно удалён!</b>")
-    await callback.message.edit_reply_markup(reply_markup=return_to_admin_panel)
+    await bot.message.edit_text("<b>Товар был успешно удалён!</b>")
+    await bot.message.edit_reply_markup(reply_markup=return_to_admin_panel)
     await remove_good_from_db(good_id)
 
     await state.reset_state()

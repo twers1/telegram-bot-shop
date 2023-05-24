@@ -50,3 +50,16 @@
 #     data = await state.get_data()
 #     await call.message.answer("Товар удачно создан")
 #     await state.reset_state()
+
+
+ # Второй метод remove goods
+#  @dp.message_handler(text="Удалить товар", state=Get_Goods_Page.page)
+# async def send_remove_goods(callback: types.CallbackQuery, state: FSMContext):
+#     keyboards = await get_all_goods_keyboard("remove")
+#
+#     await callback.message.edit_text("<b>Нажмите на товар чтобы удалить его:</b>")
+#     await callback.message.edit_reply_markup(reply_markup=keyboards[1])
+#
+#     async with state.proxy() as data:
+#         data["keyboards"] = keyboards
+#         data["page"] = 1
