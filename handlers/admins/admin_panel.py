@@ -57,7 +57,7 @@ async def get_name(message: types.Message, state: FSMContext):
 async def get_name(message: types.Message, state: FSMContext):
     await message.answer("<b>Отправьте фотографию товара(ссылку): </b>")
     async with state.proxy() as data:
-        data["price"] = int(message.text) * 100
+        data["price"] = int(message.text)
     await NewItem.next()
 
 

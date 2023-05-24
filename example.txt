@@ -53,6 +53,7 @@
 
 
  # Второй метод remove goods
+
 #  @dp.message_handler(text="Удалить товар", state=Get_Goods_Page.page)
 # async def send_remove_goods(callback: types.CallbackQuery, state: FSMContext):
 #     keyboards = await get_all_goods_keyboard("remove")
@@ -63,3 +64,48 @@
 #     async with state.proxy() as data:
 #         data["keyboards"] = keyboards
 #         data["page"] = 1
+
+#  # узнать id профиля
+
+# @dp.message_handler(commands=['id'])
+# async def cmd_id(message: types.Message):
+#     await message.answer(f'{message.from_user.id}')
+
+ # пример еще одной команды
+
+ # @dp.message_handler(Command("items"))
+# async def show_items(message: Message):
+#     await message.answer(text="На продажу у нас есть: ..\n"
+#                          "Если вам ничего не нужно - ждите отмену",
+#                          reply_markup=choice)
+#
+# @dp.callback_query_handler(text_contains="pear")
+# async def buying_pear(call: CallbackQuery):
+#     await call.answer(cache_time=60)
+#     callback_data = call.data
+#     logging.info(f"call = {callback_data}")
+#
+#     await call.message.answer("Вы выбрали купить грушу. Груша всего одна. Спаасибо",
+#                               reply_markup=pear_keyboard)
+#
+# @dp.callback_query_handler(buy_callback.filter(item_name="apple"))
+# async def buying_apples(call: CallbackQuery, callback_data: dict):
+#     await call.answer(cache_time=60)
+#     logging.info(f"call = {callback_data}")
+#     quantity = callback_data.get("quantity")
+#     await call.message.answer(f"Вы выбрали купить яблоки. Яблок всего {quantity}. Спасибо!",
+#                               reply_markup=apples_keyboard)
+#
+# @dp.callback_query_handler(text="cancel")
+# async def cancel_buying(call: CallbackQuery):
+#     await call.answer("Вы отменили эту покупку",
+#                       show_alert=True)
+#     await call.message.edit_reply_markup()
+
+#  catalog_list = InlineKeyboardMarkup(row_width=2)
+# catalog_list.add(InlineKeyboardButton(text='Категория 1', url='https://t.me/testShopTeg_bot'),
+#                  InlineKeyboardButton(text='Категория 2', url='https://t.me/testShopTeg_bot'),
+#                  InlineKeyboardButton(text='Категория 3', url='https://t.me/testShopTeg_bot'))
+
+# catalog_list_callback_data = InlineKeyboardMarkup(row_width=2)
+# catalog_list_callback_data.add()

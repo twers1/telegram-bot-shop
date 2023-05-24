@@ -52,7 +52,10 @@ import os
 # )
 
 main = ReplyKeyboardMarkup(resize_keyboard=True)
-main.add('Каталог').add('Корзина').add('Контакты')
+main.add(KeyboardButton('Каталог'))
+main.add(KeyboardButton('Корзина'))
+main.add(KeyboardButton('Контакты'))
+
 
 main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
 main_admin.add('Каталог').add('Корзина').add('Контакты').add('Админ-панель')
@@ -67,12 +70,3 @@ admin_panel.add(KeyboardButton(text="Выйти"))
 return_to_admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
 return_to_admin_panel.add(InlineKeyboardButton(text="Вернуться в меню", callback_data="return_to_admin_panel"))
 
-
-
-catalog_list = InlineKeyboardMarkup(row_width=2)
-catalog_list.add(InlineKeyboardButton(text='Категория 1', url='https://t.me/testShopTeg_bot'),
-                 InlineKeyboardButton(text='Категория 2', url='https://t.me/testShopTeg_bot'),
-                 InlineKeyboardButton(text='Категория 3', url='https://t.me/testShopTeg_bot'))
-
-# catalog_list_callback_data = InlineKeyboardMarkup(row_width=2)
-# catalog_list_callback_data.add()
