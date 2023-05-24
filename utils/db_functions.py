@@ -20,7 +20,7 @@ async def add_good_to_db(name, description, price, photo):
 
 
 async def get_all_goods():
-    cursor_obj.execute("""SELECT name id FROM goods;""")
+    cursor_obj.execute("""SELECT name, description, id FROM goods;""")
 
     return cursor_obj.fetchall()
 

@@ -2,6 +2,7 @@ import os
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from aiogram.types import Update
 
 from keyboards.inline.choice_buttons import admin_panel, return_to_admin_panel
 from loader import dp, bot
@@ -82,42 +83,36 @@ async def get_photo(message: types.Message, state: FSMContext):
 @dp.message_handler(text="Удалить товар")
 async def send_remove_goods(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        print(type(data["key"]))
+        # print(type(data["key"]))
         await bot.delete_message(message_id=data["key"], chat_id=message.from_user.id)
         await bot.send_message(message.from_user.id, "<b>Нажмите на товар чтобы удалить его:</b>", reply_markup=None)
         await bot.edit_reply_markup(reply_markup=await get_all_goods_keyboard("remove"))
-
-
 
 
 @dp.message_handler(text="Удалить товар", state=Get_Goods_Page.page)
 async def send_remove_goods(message: types.Message, state: FSMContext):
     keyboards = await get_all_goods_keyboard("remove")
 
-    await bot.message.edit_text("<b>Нажмите на товар чтобы удалить его:</b>")
-    await bot.message.edit_reply_markup(reply_markup=keyboards[1])
-
     async with state.proxy() as data:
+        await bot.delete_message(message_id=data["key"], chat_id=message.from_user.id)
+        await bot.send_message(message.from_user.id, text="<b>Нажмите на товар чтобы удалить его:</b>", reply_markup=None)
+        await bot.send_message(chat_id=message.from_user.id,reply_markup=keyboards[1], text="Все доступные товары: ")
         data["keyboards"] = keyboards
         data["page"] = 1
+    await Get_Goods_Page.first()
 
 
-@dp.message_handler(text_contains="remove_good", state=Get_Goods_Page.page)
-async def remove_good(message: types.Message, state: FSMContext):
-    callback_data = bot.data.strip().split(":")[1:]
+@dp.callback_query_handler(text_contains="remove_good", state=Get_Goods_Page.page)
+async def remove_good(callback: types.CallbackQuery, state: FSMContext):
+    callback_data = callback.data.strip().split(":")[1:]
     good_id = callback_data[0]
 
-    await bot.message.edit_text("<b>Товар был успешно удалён!</b>")
-    await bot.message.edit_reply_markup(reply_markup=return_to_admin_panel)
+    await callback.message.edit_text("<b>Товар был успешно удалён!</b>")
+    # await bot.send_message(text="Вернуться в админ-панель", reply_markup=return_to_admin_panel)
     await remove_good_from_db(good_id)
 
     await state.reset_state()
 
-
-# @dp.message_handler(commands=["cancel"], state=NewItem)
-# async def cancel(message: types.Message, state: FSMContext):
-#     await message.answer("Вы отменили создание товара")
-#     await state.reset_state()
 
 @dp.message_handler(text="Реквизиты банковской карты")
 async def bank_card_details(message: types.Message):
@@ -140,3 +135,6 @@ async def exit_from_admin_panel(callback: types.CallbackQuery, state: FSMContext
     await callback.message.delete()
 
     await state.reset_state()
+
+
+
