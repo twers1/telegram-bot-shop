@@ -4,7 +4,7 @@ from aiogram import types
 
 from config import PAYMENTS_TOKEN
 from loader import dp, bot
-from keyboards.inline.choice_buttons import main, main_admin
+from keyboards.inline.choice_buttons import main, main_admin, add_to_cart
 from loader import dp
 import os
 
@@ -69,41 +69,21 @@ async def send_good(callback: types.CallbackQuery, state: FSMContext):
     good_name, good_description, good_price, good_image = good_information
     price = [LabeledPrice(label=f"{good_name} | {good_description}", amount=good_price)]
 
-    await bot.send_invoice(callback.message.chat.id,
-                           title=f"Книга \"{good_name}\"",
-                           description=f"Описание - {good_description}",
-                           provider_token=PAYMENTS_TOKEN,
-                           currency="rub",
-                           photo_url=good_image,
-                           photo_width=220,
-                           photo_height=344,
-                           photo_size=344,
-                           is_flexible=True,
-                           prices=price,
-                           start_parameter="buy_good",
-                           payload="book",
-                           need_phone_number=True)
+    await bot.send_message(callback.message.chat.id, text=f"Имя товара - {good_name}\n"
+                                                          f"Описание - {good_description}\n"
+                                                          f"Фото - {good_image}\n"
+                                                          f"Цена - {good_price}", reply_markup=add_to_cart)
 
-
-
-    await bot.message.delete()
+    await callback.message.delete()
     await state.reset_state()
 
 
+@dp.message_handler(text="Добавить в корзину")
+async def add_cart(message: types.Message):
+    await message.answer("Здрасте")
 
 
-@dp.pre_checkout_query_handler(lambda query: True)
-async def checkout_process(pre_checkout_query: types.PreCheckoutQuery):
-    await bot.answer_pre_checkout_query(pre_checkout_query.id, ok=True)
-
-
-@dp.message_handler(content_types=ContentType.SUCCESSFUL_PAYMENT)
-async def successful_payment(message: types.Message):
-    await message.answer("<b>Вы успешно оплатили покупку! В скором времени вы "
-                         "получите свой заказ.</b>")
-
-
-@dp.callback_query_handler(text="back_to_shop_menu", state=Get_Goods_Page.page)
+@dp.callback_query_handler(text="Вернуться в каталог", state=Get_Goods_Page.page)
 async def back_to_shop_menu(callback: types.CallbackQuery, state: FSMContext):
     await callback.message.delete()
     await state.reset_state()
@@ -111,20 +91,14 @@ async def back_to_shop_menu(callback: types.CallbackQuery, state: FSMContext):
     await main(callback.message)
 
 
-@dp.callback_query_handler(text="exit_from_shop", state=Get_Goods_Page.page)
-async def exit_from_shop(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.delete()
-    await state.reset_state()
+@dp.message_handler(text='Корзина')
+async def cart(message: types.Message):
+    await message.answer(f'Корзина пуста')
 
 
 @dp.message_handler(text='Контакты')
 async def contacts(message: types.Message):
     await message.answer(f'Покупать товар у него: @123456')
-
-
-@dp.message_handler(text='Корзина')
-async def cart(message: types.Message):
-    await message.answer(f'Корзина пуста')
 
 
 @dp.message_handler()

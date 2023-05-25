@@ -20,6 +20,10 @@ type_of_payment = ReplyKeyboardMarkup(resize_keyboard=True)
 type_of_payment.add(KeyboardButton('Полная оплата'))
 type_of_payment.add(KeyboardButton('Частичная оплата'))
 
+add_to_cart = ReplyKeyboardMarkup(resize_keyboard=True)
+add_to_cart.add(KeyboardButton('Добавить в корзину'))
+add_to_cart.add(KeyboardButton('Вернуться в каталог'))
+
 
 main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
 main_admin.add('Каталог').add('Корзина').add('Контакты').add('Админ-панель')
