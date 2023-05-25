@@ -2,8 +2,8 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import (LabeledPrice, ContentType)
 from aiogram import types
 
-
-import bot
+from config import PAYMENTS_TOKEN
+from loader import dp, bot
 from keyboards.inline.choice_buttons import main, main_admin
 from loader import dp
 import os
@@ -20,13 +20,15 @@ async def cmd_start(message: types.Message):
     if message.from_user.id == int(os.getenv('ADMIN_ID')):
         await message.answer(f'Вы авторизовались как администратор', reply_markup=main_admin)
 
+    await Get_Goods_Page.first()
+
 
 @dp.message_handler(text='Каталог', state=Get_Goods_Page.page)
-async def catalog(callback: types.CallbackQuery, state: FSMContext):
+async def send_catalog_start(message: types.Message, state: FSMContext):
     keyboards = await get_all_goods_keyboard("get")
 
-    await callback.message.edit_text("<b>Каталог товаров: </b>")
-    await callback.message.edit_reply_markup(reply_markup=keyboards[1])
+    await bot.send_message(text="<b>Каталог товаров: </b>", chat_id=message.from_user.id)
+    await bot.send_message(text="Доступные товары представлены тут", reply_markup=keyboards[1], chat_id=message.from_user.id)
 
     async with state.proxy() as data:
         data["keyboards"] = keyboards
@@ -34,7 +36,7 @@ async def catalog(callback: types.CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query_handler(text="next_page", state=Get_Goods_Page.page)
-async def send_next_page(callback: types.CallbackQuery, state: FSMContext):
+async def send_next_page(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["page"] += 1
 
@@ -42,12 +44,12 @@ async def send_next_page(callback: types.CallbackQuery, state: FSMContext):
     keyboards = state_data["keyboards"]
     page = state_data["page"]
 
-    await callback.message.edit_text("<b>Каталог товаров:</b>")
-    await callback.message.edit_reply_markup(reply_markup=keyboards[page])
+    await bot.message.edit_text(text="<b>Каталог товаров:</b>")
+    await bot.message.edit_reply_markup(reply_markup=keyboards[page])
 
 
 @dp.callback_query_handler(text="previous_page", state=Get_Goods_Page.page)
-async def send_previous_page(callback: types.CallbackQuery, state: FSMContext):
+async def send_previous_page(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["page"] -= 1
 
@@ -55,8 +57,8 @@ async def send_previous_page(callback: types.CallbackQuery, state: FSMContext):
     keyboards = state_data["keyboards"]
     page = state_data["page"]
 
-    await callback.message.edit_text("<b>Каталог товаров:</b>")
-    await callback.message.edit_reply_markup(reply_markup=keyboards[page])
+    await bot.message.edit_text("<b>Каталог товаров:</b>")
+    await bot.message.edit_reply_markup(reply_markup=keyboards[page])
 
 
 @dp.callback_query_handler(text_contains="get_good", state=Get_Goods_Page.page)
@@ -70,6 +72,7 @@ async def send_good(callback: types.CallbackQuery, state: FSMContext):
     await bot.send_invoice(callback.message.chat.id,
                            title=f"Книга \"{good_name}\"",
                            description=f"Описание - {good_description}",
+                           provider_token=PAYMENTS_TOKEN,
                            currency="rub",
                            photo_url=good_image,
                            photo_width=220,
@@ -77,11 +80,13 @@ async def send_good(callback: types.CallbackQuery, state: FSMContext):
                            photo_size=344,
                            is_flexible=True,
                            prices=price,
-                           start_parameter="buy_book",
+                           start_parameter="buy_good",
                            payload="book",
                            need_phone_number=True)
 
-    await callback.message.delete()
+
+
+    await bot.message.delete()
     await state.reset_state()
 
 

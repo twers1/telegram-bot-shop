@@ -5,56 +5,20 @@ from aiogram.utils.callback_data import CallbackData
 
 import os
 
-# choice = InlineKeyboardMarkup(
-#     inline_keyboard=[
-#     [
-#         InlineKeyboardButton(text="Купить ...", callback_data=buy_callback.new(
-#             item_name="pear", quantity = 1
-#         )),
-#         InlineKeyboardButton(text="Купить...", callback_data="buy:apple:5")
-#     ],
-#     [
-#
-#         InlineKeyboardButton(text="Отмена", callback_data="cancel")
-#
-#     ]
-# ]
-# )
-#
-#
-# choice2 = InlineKeyboardMarkup(row_width=2)
-#
-# buy_pear = InlineKeyboardButton(text="Купить грушу",
-#                                 callback_data=buy_callback.new(item_name="pear", quantity=1))
-# choice2.insert(buy_pear)
-#
-# buy_apples = InlineKeyboardButton(text="Купить..", callback_data="buy:apple:5")
-# choice2.insert(buy_apples )
-#
-# cancel_button = InlineKeyboardButton(text="Отмена", callback_data="cancel")
-# choice2.insert(cancel_button)
-#
-#
-# pear_keyboard = InlineKeyboardMarkup(
-#     inline_keyboard=[
-#         [
-#             InlineKeyboardButton(text="Купи тут", url="https://t.me/testShopTeg_bot")
-#         ]
-#     ]
-# )
-#
-# apples_keyboard = InlineKeyboardMarkup(
-#     inline_keyboard=[
-#         [
-#             InlineKeyboardButton(text="Купи тут", url="https://t.me/testShopTeg_bot")
-#         ]
-#     ]
-# )
+
 
 main = ReplyKeyboardMarkup(resize_keyboard=True)
 main.add(KeyboardButton('Каталог'))
 main.add(KeyboardButton('Корзина'))
 main.add(KeyboardButton('Контакты'))
+
+product_design = ReplyKeyboardMarkup(resize_keyboard=True)
+product_design.add(KeyboardButton('СДЭК'))
+product_design.add(KeyboardButton('Почта России'))
+
+type_of_payment = ReplyKeyboardMarkup(resize_keyboard=True)
+type_of_payment.add(KeyboardButton('Полная оплата'))
+type_of_payment.add(KeyboardButton('Частичная оплата'))
 
 
 main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
