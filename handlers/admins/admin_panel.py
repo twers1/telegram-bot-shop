@@ -2,9 +2,8 @@ import os
 
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from aiogram.types import Update
 
-from keyboards.inline.choice_buttons import admin_panel, return_to_admin_panel
+from keyboards.inline.choice_buttons import admin_panel
 from loader import dp, bot
 from states import NewItem, Get_Goods_Page
 from utils.db_functions import add_good_to_db, remove_good_from_db
@@ -13,8 +12,8 @@ from utils.inline_keyboards import get_all_goods_keyboard
 
 @dp.message_handler(text="Админ-панель")
 async def contacts(message: types.Message, state: FSMContext):
+    print("Бот запущен(админ-панель)")
     if message.from_user.id == int(os.getenv('ADMIN_ID')):
-
         bot_message = await bot.send_message(message.from_user.id, f'Вы вошли в админ-панель', reply_markup=admin_panel)
         async with state.proxy() as data:
             data["key"] = bot_message.message_id

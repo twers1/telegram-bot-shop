@@ -69,12 +69,11 @@ async def send_good(callback: types.CallbackQuery, state: FSMContext):
     good_name, good_description, good_price, good_image = good_information
     price = [LabeledPrice(label=f"{good_name} | {good_description}", amount=good_price)]
 
-    await bot.send_message(callback.message.chat.id, text=f"Имя товара - {good_name}\n"
+    await bot.send_photo(callback.message.chat.id, photo=good_image,caption=f"Имя товара - {good_name}\n"
                                                           f"Описание - {good_description}\n"
-                                                          f"Фото - {good_image}\n"
                                                           f"Цена - {good_price}", reply_markup=add_to_cart)
 
-    await callback.message.delete()
+    # await callback.message.delete()
     await state.reset_state()
 
 

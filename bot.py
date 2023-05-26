@@ -1,11 +1,10 @@
 
-from aiogram import Bot, Dispatcher, executor
+from aiogram import Bot, executor
 
 from dotenv import load_dotenv
 
 import os
 
-from utils import notify_admins, set_bot_commands
 from utils.connect_db import con
 from utils.db_functions import create_table
 from loader import dp
