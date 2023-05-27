@@ -22,7 +22,10 @@ type_of_payment.add(KeyboardButton('Частичная оплата'))
 
 add_to_cart = ReplyKeyboardMarkup(resize_keyboard=True)
 add_to_cart.add(KeyboardButton('Добавить в корзину'))
-add_to_cart.add(KeyboardButton('Вернуться в каталог'))
+add_to_cart.add(KeyboardButton('Вернуться в меню'))
+
+show_cart_all = ReplyKeyboardMarkup(resize_keyboard=True)
+show_cart_all.add(KeyboardButton('Перейти в корзину'))
 
 
 main_admin = ReplyKeyboardMarkup(resize_keyboard=True)

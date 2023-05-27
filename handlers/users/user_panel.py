@@ -2,9 +2,8 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import (LabeledPrice, ContentType)
 from aiogram import types
 
-from config import PAYMENTS_TOKEN
 from loader import dp, bot
-from keyboards.inline.choice_buttons import main, main_admin, add_to_cart
+from keyboards.inline.choice_buttons import main, main_admin, add_to_cart, show_cart_all
 from loader import dp
 import os
 
@@ -33,6 +32,7 @@ async def send_catalog_start(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["keyboards"] = keyboards
         data["page"] = 1
+
 
 
 @dp.callback_query_handler(text="next_page", state=Get_Goods_Page.page)
@@ -73,26 +73,28 @@ async def send_good(callback: types.CallbackQuery, state: FSMContext):
                                                           f"Описание - {good_description}\n"
                                                           f"Цена - {good_price}", reply_markup=add_to_cart)
 
-    # await callback.message.delete()
+    await callback.message.delete()
     await state.reset_state()
 
 
 @dp.message_handler(text="Добавить в корзину")
-async def add_cart(message: types.Message):
-    await message.answer("Здрасте")
+async def add_cart(callback: types.CallbackQuery, state: FSMContext):
+    callback_data = callback.data.strip().split(":")[1]
+    good_id = int(callback_data)
+
+    await bot.send_message(text='Товар добавлен в корзину.', reply_markup=show_cart_all)
 
 
-@dp.callback_query_handler(text="Вернуться в каталог", state=Get_Goods_Page.page)
-async def back_to_shop_menu(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.delete()
-    await state.reset_state()
+@dp.message_handler(text="Вернуться в меню")
+async def return_to_catalog(message: types.Message, state: FSMContext):
+    await cmd_start(message)
 
-    await main(callback.message)
 
 
 @dp.message_handler(text='Корзина')
-async def cart(message: types.Message):
-    await message.answer(f'Корзина пуста')
+async def show_cart(message: types.Message):
+    await message.answer("Корзина пуста!")
+
 
 
 @dp.message_handler(text='Контакты')
