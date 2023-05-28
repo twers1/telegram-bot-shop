@@ -12,6 +12,22 @@ main.add(KeyboardButton('Каталог'))
 main.add(KeyboardButton('Корзина'))
 main.add(KeyboardButton('Контакты'))
 
+main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
+main_admin.add('Каталог').add('Корзина').add('Контакты').add('Админ-панель')
+
+admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
+admin_panel.add(KeyboardButton('Добавить товар'))
+admin_panel.add(KeyboardButton('Удалить товар'))
+admin_panel.add(KeyboardButton('Реквизиты банковской карты'))
+admin_panel.add(KeyboardButton('Размер предоплаты'))
+admin_panel.add(KeyboardButton(text="Выйти"))
+
+button = InlineKeyboardButton('Введите номер карты: ', callback_data='bank_card_number')
+keyboard = InlineKeyboardMarkup().add(button)
+
+return_to_admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
+return_to_admin_panel.add(InlineKeyboardButton(text="Вернуться в меню", callback_data="return_to_admin_panel"))
+
 product_design = ReplyKeyboardMarkup(resize_keyboard=True)
 product_design.add(KeyboardButton('СДЭК'))
 product_design.add(KeyboardButton('Почта России'))
@@ -26,18 +42,4 @@ add_to_cart.add(KeyboardButton('Вернуться в меню'))
 
 show_cart_all = ReplyKeyboardMarkup(resize_keyboard=True)
 show_cart_all.add(KeyboardButton('Перейти в корзину'))
-
-
-main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
-main_admin.add('Каталог').add('Корзина').add('Контакты').add('Админ-панель')
-
-admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
-admin_panel.add(KeyboardButton('Добавить товар'))
-admin_panel.add(KeyboardButton('Удалить товар', ))
-admin_panel.add(KeyboardButton('Реквизиты банковской карты'))
-admin_panel.add(KeyboardButton('Размер предоплаты'))
-admin_panel.add(KeyboardButton(text="Выйти"))
-
-return_to_admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
-return_to_admin_panel.add(InlineKeyboardButton(text="Вернуться в меню", callback_data="return_to_admin_panel"))
 

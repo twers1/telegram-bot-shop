@@ -35,7 +35,7 @@ async def send_catalog_start(message: types.Message, state: FSMContext):
 
 
 
-@dp.callback_query_handler(text="next_page", state=Get_Goods_Page.page)
+@dp.message_handler(text="next_page", state=Get_Goods_Page.page)
 async def send_next_page(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["page"] += 1
@@ -44,8 +44,8 @@ async def send_next_page(message: types.Message, state: FSMContext):
     keyboards = state_data["keyboards"]
     page = state_data["page"]
 
-    await bot.message.edit_text(text="<b>Каталог товаров:</b>")
-    await bot.message.edit_reply_markup(reply_markup=keyboards[page])
+    await message.edit_text(text="<b>Каталог товаров:</b>")
+    await message.edit_reply_markup(reply_markup=keyboards[page])
 
 
 @dp.callback_query_handler(text="previous_page", state=Get_Goods_Page.page)

@@ -1,6 +1,9 @@
+from aiogram.dispatcher import FSMContext
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.callback_data import CallbackData
+from aiogram import types
 
+from states import BankCardState
 from utils.db_functions import get_all_goods
 
 get_good_callback = CallbackData("get_good", "id")
@@ -57,3 +60,15 @@ async def get_all_goods_keyboard(mode):
             page += 1
 
     return all_goods_keyboards
+
+
+# async def set_bank_card_number(callback_query: types.CallbackQuery):
+#     await BankCardState.waiting_for_bank_card.set()
+#     await callback_query.answer("Please enter your bank card number:")
+#
+#
+# async def process_bank_card_input(message: types.Message, state: FSMContext):
+#     bank_card_number = message.text
+#     await state.update_data(bank_card_number=bank_card_number)
+#     await message.answer(f"Your bank card number has been set to {bank_card_number}.")
+#     await state.reset_state()
