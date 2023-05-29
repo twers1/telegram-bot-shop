@@ -1,9 +1,9 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import (LabeledPrice, ContentType, InlineKeyboardMarkup, InlineKeyboardButton)
+from aiogram.types import (LabeledPrice, callback_query, InlineKeyboardMarkup, InlineKeyboardButton)
 from aiogram import types
 
-from loader import dp, bot
-from keyboards.inline.choice_buttons import main, main_admin, add_to_cart, show_cart_all, cart_markup
+from loader import  bot
+from keyboards.inline.choice_buttons import main, main_admin, show_cart_all, cart_markup
 from loader import dp
 import os
 
@@ -69,6 +69,10 @@ async def send_good(callback: types.CallbackQuery, state: FSMContext):
     good_name, good_description, good_price, good_image = good_information
     price = [LabeledPrice(label=f"{good_name} | {good_description}", amount=good_price)]
 
+    add_to_cart = InlineKeyboardMarkup().add(
+        InlineKeyboardButton(text='Добавить в корзину', callback_data=f'add_to_cart:{good_id}'))
+    add_to_cart.add(InlineKeyboardButton(text='Вернуться в меню', callback_data='return_to_menu'))
+
     await bot.send_photo(callback.message.chat.id, photo=good_image,caption=f"Имя товара - {good_name}\n"
                                                           f"Описание - {good_description}\n"
                                                           f"Цена - {good_price}", reply_markup=add_to_cart)
@@ -77,7 +81,7 @@ async def send_good(callback: types.CallbackQuery, state: FSMContext):
     await state.reset_state()
 
 
-@dp.callback_query_handler(lambda c: c.data and c.data.startswith('add_to_cart'))
+@dp.callback_query_handler(lambda c: c.data and c.data.startswith('add_to_cart'), state="*")
 async def process_add_to_cart(callback_query: types.CallbackQuery, state: FSMContext):
     good_id = int(callback_query.data.split(':')[1])
     user_id = callback_query.from_user.id
@@ -85,21 +89,6 @@ async def process_add_to_cart(callback_query: types.CallbackQuery, state: FSMCon
     await add_good_to_cart(user_id, good_id)
 
     await bot.send_message(callback_query.from_user.id, text='Товар добавлен в корзину.', reply_markup=show_cart_all)
-# @dp.message_handler(text="Добавить в корзину")
-# async def add_cart(callback: types.CallbackQuery, state: FSMContext):
-#     callback_data = callback.data.strip().split(":")[1]
-#     good_id = int(callback_data)
-#
-#     user_id = callback.from_user.id
-#     await add_good_to_cart(user_id, good_id)
-#
-#     await bot.send_message(callback.message.chat.id, text='Товар добавлен в корзину.', reply_markup=show_cart_all)
-
-# @dp.callback_query_handler(text_contains="add_to_cart")
-# async def add_to_cart_callback(callback: types.CallbackQuery, state: FSMContext):
-#     good_id = int(callback.data.split(':')[1])
-#     await add_good_to_cart(good_id)
-#     await bot.answer_callback_query(callback.id, text="Товар добавлен в корзину")
 
 
 @dp.message_handler(text="Вернуться в меню")

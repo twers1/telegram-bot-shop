@@ -12,6 +12,15 @@ async def create_table():
     con.commit()
 
 
+async def create_table():
+    cursor_obj.execute("""CREATE TABLE IF NOT EXISTS carts (
+           user_id INT NOT NULL,
+           good_id INT NOT NULL,
+           id INT GENERATED ALWAYS AS IDENTITY);""")
+
+    con.commit()
+
+
 async def add_good_to_db(name, description, price, photo):
     cursor_obj.execute(f"""INSERT INTO goods VALUES ('{name}', '{description}', {price}, '{photo}') 
     ON CONFLICT DO NOTHING;""")
