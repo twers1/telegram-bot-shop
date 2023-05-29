@@ -35,3 +35,19 @@ async def remove_good_from_db(id):
     cursor_obj.execute(f"""DELETE FROM goods WHERE id = {id};""")
 
     con.commit()
+
+
+async def add_good_to_cart(user_id, good_id):
+    cursor_obj.execute(f"""INSERT INTO carts (user_id, good_id) VALUES ({user_id}, {good_id});""")
+
+    con.commit()
+
+
+async def get_cart(user_id):
+    cursor_obj.execute(f"""SELECT goods.name, goods.description, goods.price, goods.photo 
+    FROM goods INNER JOIN carts ON goods.id = carts.good_id WHERE carts.user_id = {user_id};""")
+
+    return cursor_obj.fetchall()
+
+async def delete_cart(user_id):
+    cursor_obj.execute()
