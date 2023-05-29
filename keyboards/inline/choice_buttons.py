@@ -37,7 +37,7 @@ type_of_payment.add(KeyboardButton('Полная оплата'))
 type_of_payment.add(KeyboardButton('Частичная оплата'))
 
 add_to_cart = ReplyKeyboardMarkup(resize_keyboard=True)
-add_to_cart.add(KeyboardButton(text='Добавить в корзину', callback_data='add_to_cart'))
+add_to_cart.add(InlineKeyboardButton(text='Добавить в корзину', callback_data='add_to_cart'))
 add_to_cart.add(KeyboardButton('Вернуться в меню'))
 
 cart_markup = ReplyKeyboardMarkup(resize_keyboard=True)
