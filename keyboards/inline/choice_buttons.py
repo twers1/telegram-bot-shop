@@ -25,8 +25,8 @@ admin_panel.add(KeyboardButton(text="Выйти"))
 button = InlineKeyboardButton('Введите номер карты: ', callback_data='bank_card_number')
 keyboard = InlineKeyboardMarkup().add(button)
 
-return_to_admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
-return_to_admin_panel.add(InlineKeyboardButton(text="Вернуться в меню", callback_data="return_to_admin_panel"))
+# return_to_admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
+# return_to_admin_panel.add(InlineKeyboardButton(text="Вернуться в меню", callback_data="return_to_admin_panel"))
 
 product_design = ReplyKeyboardMarkup(resize_keyboard=True)
 product_design.add(KeyboardButton('СДЭК'))
@@ -45,5 +45,5 @@ cart_markup.add(KeyboardButton(text='Очистить корзину', callback_
 cart_markup.add(KeyboardButton('Заказать'))
 
 show_cart_all = ReplyKeyboardMarkup(resize_keyboard=True)
-show_cart_all.add(KeyboardButton('Перейти в корзину'))
+show_cart_all.add(KeyboardButton(text='Перейти в корзину'))
 

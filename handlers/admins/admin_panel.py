@@ -147,6 +147,7 @@ async def prepayment_amount(message: types.Message):
         'Вы нажали на кнопку "Реквизиты банковской карты".\nНажмите на кнопку, чтобы ввести номер банковской карты.',
         reply_markup=keyboard)
 
+
 @dp.callback_query_handler(lambda c: c.data == 'bank_card_number')
 async def process_bank_card_button(callback_query: types.CallbackQuery):
     # Отправляем запрос на ввод номера банковской карты

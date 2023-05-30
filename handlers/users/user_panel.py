@@ -1,5 +1,5 @@
 from aiogram.dispatcher import FSMContext
-from aiogram.types import (LabeledPrice, callback_query, InlineKeyboardMarkup, InlineKeyboardButton)
+from aiogram.types import (LabeledPrice, InlineKeyboardMarkup, InlineKeyboardButton)
 from aiogram import types
 
 from loader import  bot
@@ -8,7 +8,7 @@ from loader import dp
 import os
 
 from states import Get_Goods_Page
-from utils.db_functions import get_good_from_db
+from utils.db_functions import get_good_from_db, delete_cart
 from utils.inline_keyboards import get_all_goods_keyboard
 from utils.db_functions import get_cart, add_good_to_cart
 
@@ -32,7 +32,6 @@ async def send_catalog_start(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["keyboards"] = keyboards
         data["page"] = 1
-
 
 
 @dp.message_handler(text="next_page", state=Get_Goods_Page.page)
@@ -91,25 +90,37 @@ async def process_add_to_cart(callback_query: types.CallbackQuery, state: FSMCon
     await bot.send_message(callback_query.from_user.id, text='Товар добавлен в корзину.', reply_markup=show_cart_all)
 
 
-@dp.message_handler(text="Вернуться в меню")
+@dp.callback_query_handler(lambda c: c.data and c.data.startswith('return_to_menu'))
 async def return_to_catalog(message: types.Message, state: FSMContext):
-    await cmd_start(message)
+    await send_catalog_start(message, state)
+
+
+@dp.message_handler(text="Перейти в корзину")
+async def go_to_cart(message: types.Message):
+    await show_cart(message)
 
 
 @dp.message_handler(text='Корзина')
 async def show_cart(message: types.Message):
+    print('Я в корзине')
     user_id = message.from_user.id
     cart = await get_cart(user_id)
 
     if not cart:
         await message.answer("Корзина пуста!")
     else:
+        total_price = 0
+        cart_text = "<b>Товары в корзине:</b>\n\n"
         for good_information in cart:
             good_name, good_description, good_price, good_image = good_information
-            await bot.send_photo(message.chat.id, photo=good_image, caption=f"Имя товара - {good_name}\n"
-                                                                            f"Описание - {good_description}\n"
-                                                                            f"Цена - {good_price}",
-                                 reply_markup=cart_markup)
+            cart_text += f"{good_name} | {good_description}\nЦена - {good_price}\n\n"
+            total_price += good_price
+
+        # Выводим итоговую сумму в конце списка товаров
+        cart_text += f"<b>Итого: {total_price}</b>"
+
+        # Отправляем все товары и итоговую сумму в одном сообщении
+        await bot.send_message(message.chat.id, text=cart_text, reply_markup=cart_markup, parse_mode="HTML")
 
 
 @dp.callback_query_handler(lambda c: c.data == 'clear_cart')
@@ -119,10 +130,7 @@ async def process_clear_cart(callback_query: types.CallbackQuery):
     await bot.answer_callback_query(callback_query.id, text="Корзина очищена")
 
 async def clear_cart(user_id):
-    # Ваш код для очистки корзины
     await delete_cart(user_id)
-
-
 
 
 @dp.message_handler(text='Контакты')

@@ -21,6 +21,15 @@ async def create_table():
     con.commit()
 
 
+async def create_table():
+    cursor_obj.execute("""CREATE TABLE IF NOT EXISTS bank_card (
+           user_id INT NOT NULL,
+           card_number VARCHAR(16) NOT NULL,
+           id INT GENERATED ALWAYS AS IDENTITY);""")
+
+    con.commit()
+
+
 async def add_good_to_db(name, description, price, photo):
     cursor_obj.execute(f"""INSERT INTO goods VALUES ('{name}', '{description}', {price}, '{photo}') 
     ON CONFLICT DO NOTHING;""")
@@ -53,10 +62,12 @@ async def add_good_to_cart(user_id, good_id):
 
 
 async def get_cart(user_id):
-    cursor_obj.execute(f"""SELECT goods.name, goods.description, goods.price, goods.photo 
-    FROM goods INNER JOIN carts ON goods.id = carts.good_id WHERE carts.user_id = {user_id};""")
+    cursor_obj.execute(f"""SELECT name, description, price, photo 
+    FROM goods
+    JOIN carts ON goods.id = carts.good_id WHERE carts.user_id = {user_id};""")
 
     return cursor_obj.fetchall()
+
 
 async def delete_cart(user_id):
     cursor_obj.execute()
