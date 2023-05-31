@@ -70,7 +70,9 @@ async def get_cart(user_id):
 
 
 async def delete_cart(user_id):
-    cursor_obj.execute()
+    cursor_obj.execute(f"""DELETE FROM carts WHERE user_id = {user_id} """)
+
+    con.commit()
 
 
 async def save_bank_card(user_id, card_number):

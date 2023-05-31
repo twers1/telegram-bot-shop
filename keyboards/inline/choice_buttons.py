@@ -43,7 +43,7 @@ type_of_payment.add(KeyboardButton('Частичная оплата'))
 
 
 cart_markup = ReplyKeyboardMarkup(resize_keyboard=True)
-cart_markup.add(KeyboardButton(text='Очистить корзину', callback_data='clear_cart'))
+cart_markup.add(KeyboardButton(text='Очистить корзину'))
 cart_markup.add(KeyboardButton('Заказать'))
 
 show_cart_all = ReplyKeyboardMarkup(resize_keyboard=True)

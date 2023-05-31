@@ -103,8 +103,8 @@ async def return_to_catalog(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(text="Перейти в корзину")
-async def go_to_cart(message: types.Message):
-    await show_cart()
+async def go_to_cart(message: types.Message, state: FSMContext):
+    await show_cart(message, state)
 
 
 @dp.message_handler(text='Корзина', state=Get_Goods_Page.page)
@@ -132,14 +132,11 @@ async def show_cart(message: types.Message, state: FSMContext):
         await bot.send_message(message.chat.id, text=cart_text, reply_markup=cart_markup, parse_mode="HTML")
 
 
-@dp.callback_query_handler(lambda c: c.data == 'clear_cart')
-async def process_clear_cart(callback_query: types.CallbackQuery):
-    user_id = callback_query.from_user.id
-    await clear_cart(user_id)
-    await bot.answer_callback_query(callback_query.id, text="Корзина очищена")
-
-async def clear_cart(user_id):
+@dp.message_handler(text="Очистить корзину")
+async def process_clear_cart(message: types.Message):
+    user_id = message.from_user.id
     await delete_cart(user_id)
+    await bot.send_message(message.chat.id, text='Корзина пуста!', reply_markup=main)
 
 
 @dp.message_handler(text='Контакты', state=Get_Goods_Page.page)
