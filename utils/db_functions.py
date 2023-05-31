@@ -1,4 +1,7 @@
+import uuid
+
 from utils.connect_db import con, cursor_obj
+
 
 
 async def create_table():
@@ -25,6 +28,19 @@ async def create_table():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS bank_card (
            user_id INT NOT NULL,
            card_number VARCHAR(16) NOT NULL,
+           id INT GENERATED ALWAYS AS IDENTITY);""")
+
+    con.commit()
+
+
+async def create_table():
+    cursor_obj.execute("""CREATE TABLE IF NOT EXISTS orders (
+           user_id INT NOT NULL,
+           fio VARCHAR(200) NOT NULL,
+           phone_number INT NOT NULL,
+           delivery_method TEXT NOT NULL,
+           payment_method TEXT NOT NULL, 
+           order_number INT NOT NULL,
            id INT GENERATED ALWAYS AS IDENTITY);""")
 
     con.commit()
@@ -85,3 +101,22 @@ async def get_bank_card(user_id):
     cursor_obj.execute(f"""SELECT card_number FROM bank_card WHERE user_id={user_id}""")
 
     return cursor_obj.fetchone()
+
+
+async def save_order(user_id, fio, phone_number, delivery_method, payment_method, order_number):
+    cursor_obj.execute(f"""INSERT INTO orders (user_id, fio, phone_number, delivery_method, payment_method, order_number) VALUES ({fio}, {phone_number},
+    {delivery_method}, {payment_method}, {order_number}
+""")
+
+    con.commit()
+
+
+async def get_order(user_id):
+    cursor_obj.execute(f"""SELECT fio, phone_number, delivery_method, payment_method, order_number FROM orders WHERE user_id={user_id}""")
+
+    return cursor_obj.fetchone()
+
+
+def generate_order_number():
+    """Генерирует уникальный номер для заказа"""
+    return str(uuid.uuid4())

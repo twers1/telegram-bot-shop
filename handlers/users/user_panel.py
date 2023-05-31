@@ -3,12 +3,13 @@ from aiogram.types import (LabeledPrice, InlineKeyboardMarkup, InlineKeyboardBut
 from aiogram import types
 
 from loader import  bot
-from keyboards.inline.choice_buttons import main, main_admin, show_cart_all, cart_markup
+from keyboards.inline.choice_buttons import main, main_admin, show_cart_all, cart_markup, delivery_keyboard, \
+    payment_keyboard
 from loader import dp
 import os
 
 from states import Get_Goods_Page
-from utils.db_functions import get_good_from_db, delete_cart
+from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number
 from utils.inline_keyboards import get_all_goods_keyboard
 from utils.db_functions import get_cart, add_good_to_cart
 
@@ -28,6 +29,7 @@ async def cmd_start(message: types.Message):
 # @dp.message_handler(state='*')
 # async def ggggg_state(message: types.Message, state: FSMContext):
 #     print(message.text, await state.get_state())
+
 
 @dp.message_handler(text='Каталог', state=Get_Goods_Page.page)
 async def send_catalog_start(message: types.Message, state: FSMContext):
@@ -137,6 +139,34 @@ async def process_clear_cart(message: types.Message):
     user_id = message.from_user.id
     await delete_cart(user_id)
     await bot.send_message(message.chat.id, text='Корзина пуста!', reply_markup=main)
+
+
+@dp.message_handler(text='Заказать')
+async def order_start(message: types.Message):
+    user_id = message.from_user.id
+    # Просим пользователя ввести ФИО и сохраняем в базу данных
+    await bot.send_message(message.chat.id, 'Введите свое ФИО:')
+    fio = (await bot.wait_for('message')).text
+
+    # Просим пользователя ввести номер телефона и сохраняем в базу данных
+    await bot.send_message(message.chat.id, 'Введите номер телефона:')
+    phone_number = (await bot.wait_for('message')).text
+
+    # Просим пользователя выбрать метод доставки и сохраняем в базу данных
+    await bot.send_message(message.chat.id, 'Выберите метод доставки:', reply_markup=delivery_keyboard)
+    delivery_method = (await bot.wait_for('message')).text
+
+    # Просим пользователя выбрать метод оплаты и сохраняем в базу данных
+    await bot.send_message(message.chat.id, 'Выберите метод оплаты:', reply_markup=payment_keyboard)
+    payment_method = (await bot.wait_for('message')).text
+
+    order_number = generate_order_number()
+    await save_order(user_id, fio, phone_number, delivery_method, payment_method, order_number)
+
+
+# @dp.message_handler(text='СДЭК')
+# async def cdek(message: types.Message):
+#     user_id=message.from_user.id
 
 
 @dp.message_handler(text='Контакты', state=Get_Goods_Page.page)
