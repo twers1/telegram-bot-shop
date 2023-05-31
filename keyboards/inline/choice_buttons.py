@@ -22,7 +22,7 @@ admin_panel.add(KeyboardButton('Добавить товар'))
 admin_panel.add(KeyboardButton('Удалить товар'))
 admin_panel.add(KeyboardButton('Реквизиты банковской карты'))
 admin_panel.add(KeyboardButton('Размер предоплаты'))
-admin_panel.add(KeyboardButton(text="Выйти"))
+# admin_panel.add(KeyboardButton(text="Выйти"))
 
 button = InlineKeyboardButton('Введите номер карты: ', callback_data='bank_card_number')
 keyboard = InlineKeyboardMarkup().add(button)
@@ -48,4 +48,7 @@ cart_markup.add(KeyboardButton('Заказать'))
 
 show_cart_all = ReplyKeyboardMarkup(resize_keyboard=True)
 show_cart_all.add(KeyboardButton(text='Перейти в корзину'))
+
+# exit_to_admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
+# exit_to_admin_panel.add(KeyboardButton(text="Вернуться в админ-панель"))
 

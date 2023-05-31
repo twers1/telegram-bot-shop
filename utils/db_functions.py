@@ -74,6 +74,12 @@ async def delete_cart(user_id):
 
 
 async def save_bank_card(user_id, card_number):
-    cursor_obj.execute(f"""INSERT INTO bank_cards (user_id, card_number) VALUES ({user_id}, {card_number})""")
+    cursor_obj.execute(f"""INSERT INTO bank_card (user_id, card_number) VALUES ({user_id}, {card_number})""")
 
     con.commit()
+
+
+async def get_bank_card(user_id):
+    cursor_obj.execute(f"""SELECT card_number FROM bank_card WHERE user_id={user_id}""")
+
+    return cursor_obj.fetchone()

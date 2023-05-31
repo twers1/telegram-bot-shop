@@ -142,8 +142,8 @@ async def clear_cart(user_id):
     await delete_cart(user_id)
 
 
-@dp.message_handler(text='Контакты')
-async def contacts(message: types.Message):
+@dp.message_handler(text='Контакты', state=Get_Goods_Page.page)
+async def contacts(message: types.Message, state: FSMContext):
     await message.answer(f'Покупать товар у него: @123456')
 
 

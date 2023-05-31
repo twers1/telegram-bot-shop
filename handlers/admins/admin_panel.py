@@ -7,11 +7,11 @@ from aiogram.dispatcher import FSMContext
 from keyboards.inline.choice_buttons import admin_panel, keyboard
 from loader import dp, bot
 from states import NewItem, Get_Goods_Page, BankCardState
-from utils.db_functions import add_good_to_db, remove_good_from_db, save_bank_card
+from utils.db_functions import add_good_to_db, remove_good_from_db, save_bank_card, get_bank_card
 from utils.inline_keyboards import get_all_goods_keyboard
 
 
-@dp.message_handler(text="Админ-панель")
+@dp.message_handler(text="Админ-панель", state=Get_Goods_Page.page)
 async def contacts(message: types.Message, state: FSMContext):
     print("Бот запущен(админ-панель)")
     if message.from_user.id == int(os.getenv('ADMIN_ID')):
@@ -108,7 +108,6 @@ async def remove_good(callback: types.CallbackQuery, state: FSMContext):
     good_id = callback_data[0]
 
     await callback.message.edit_text("<b>Товар был успешно удалён!</b>")
-    # await bot.send_message(text="Вернуться в админ-панель", reply_markup=return_to_admin_panel)
     await remove_good_from_db(good_id)
 
     await state.reset_state()
@@ -116,20 +115,20 @@ async def remove_good(callback: types.CallbackQuery, state: FSMContext):
     await Get_Goods_Page.page.set()
 
 
-@dp.message_handler(text='Реквизиты банковской карты')
-async def bank_card_details(message: types.Message):
+@dp.message_handler(text='Реквизиты банковской карты', state=Get_Goods_Page.page)
+async def bank_card_details(message: types.Message, state:FSMContext):
     # Отправляем сообщение с запросом номера банковской карты и кнопкой
     await message.answer('Вы нажали на кнопку "Реквизиты банковской карты".\nНажмите на кнопку, чтобы ввести номер банковской карты.', reply_markup=keyboard)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'bank_card_number')
-async def process_bank_card_button(callback_query: types.CallbackQuery):
+@dp.callback_query_handler(lambda c: c.data == 'bank_card_number', state=Get_Goods_Page.page)
+async def process_bank_card_button(callback_query: types.CallbackQuery, state:FSMContext):
     # Отправляем запрос на ввод номера банковской карты
     await bot.send_message(callback_query.from_user.id, 'Введите номер банковской карты:')
 
 
-@dp.message_handler(regexp=r'^\d{4}\s\d{4}\s\d{4}\s\d{4}$')
-async def process_bank_card_number(message: types.Message):
+@dp.message_handler(regexp=r'^\d{4}\s\d{4}\s\d{4}\s\d{4}$', state=Get_Goods_Page.page)
+async def process_bank_card_number(message: types.Message, state:FSMContext):
     # Проверяем, что пользователь ввел 16 цифр, разделенных пробелами
     card_number = message.text
 
@@ -139,28 +138,36 @@ async def process_bank_card_number(message: types.Message):
     await save_bank_card(user_id=message.from_user.id, card_number=card_number)
 
     # Отправляем сообщение с подтверждением ввода номера банковской карты
-    await bot.send_message(message.chat.id, f'Вы успешно ввели номер банковской карты: {card_number}')
+    await bot.send_message(message.chat.id, f'Вы успешно ввели номер банковской карты: {card_number}', reply_markup=admin_panel)
 
 
-@dp.message_handler(text="Размер предоплаты")
-async def prepayment_amount(message: types.Message):
-    # Отправляем сообщение с запросом номера банковской карты и кнопкой
-    await message.answer(
-        'Вы нажали на кнопку "Реквизиты банковской карты".\nНомер банковской карты:')
+@dp.message_handler(text="Размер предоплаты", state=Get_Goods_Page.page)
+async def prepayment_amount(message: types.Message, state:FSMContext):
+    user_id = message.from_user.id
+    # Получаем номер карты из базы данных
+    card_number = await get_bank_card(user_id)
+    if card_number:
+        await message.answer(f"Номер вашей банковской карты: <b>{card_number[0]}</b>", reply_markup=admin_panel)
+    else:
+        await message.answer("Номер вашей банковской карты не найден.", reply_markup=admin_panel)
 
 
-
-@dp.callback_query_handler(text="return_to_admin_panel")
-async def return_to_admin_menu(callback: types.CallbackQuery):
-    await callback.message.delete()
-    await contacts(callback.message)
+# @dp.message_handler(text="Вернуться в админ-панель")
+# async def exit_admin(message: types.Message, state: FSMContext):
+#     await contacts(message, state)
 
 
-@dp.callback_query_handler(text="exit_from_admin_panel", state=Get_Goods_Page.page)
-async def exit_from_admin_panel(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.delete()
-
-    await state.reset_state()
+# @dp.callback_query_handler(text="return_to_admin_panel")
+# async def return_to_admin_menu(callback: types.CallbackQuery):
+#     await callback.message.delete()
+#     await contacts(callback.message)
+#
+#
+# @dp.callback_query_handler(text="exit_from_admin_panel", state=Get_Goods_Page.page)
+# async def exit_from_admin_panel(callback: types.CallbackQuery, state: FSMContext):
+#     await callback.message.delete()
+#
+#     await state.reset_state()
 
 
 
