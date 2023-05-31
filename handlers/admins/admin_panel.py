@@ -7,7 +7,7 @@ from aiogram.dispatcher import FSMContext
 from keyboards.inline.choice_buttons import admin_panel, keyboard
 from loader import dp, bot
 from states import NewItem, Get_Goods_Page, BankCardState
-from utils.db_functions import add_good_to_db, remove_good_from_db
+from utils.db_functions import add_good_to_db, remove_good_from_db, save_bank_card
 from utils.inline_keyboards import get_all_goods_keyboard
 
 
@@ -136,6 +136,8 @@ async def process_bank_card_number(message: types.Message):
     # Удаляем пробелы из номера карты
     card_number = card_number.replace(' ','')
 
+    await save_bank_card(user_id=message.from_user.id, card_number=card_number)
+
     # Отправляем сообщение с подтверждением ввода номера банковской карты
     await bot.send_message(message.chat.id, f'Вы успешно ввели номер банковской карты: {card_number}')
 
@@ -144,26 +146,8 @@ async def process_bank_card_number(message: types.Message):
 async def prepayment_amount(message: types.Message):
     # Отправляем сообщение с запросом номера банковской карты и кнопкой
     await message.answer(
-        'Вы нажали на кнопку "Реквизиты банковской карты".\nНажмите на кнопку, чтобы ввести номер банковской карты.',
-        reply_markup=keyboard)
+        'Вы нажали на кнопку "Реквизиты банковской карты".\nНомер банковской карты:')
 
-
-@dp.callback_query_handler(lambda c: c.data == 'bank_card_number')
-async def process_bank_card_button(callback_query: types.CallbackQuery):
-    # Отправляем запрос на ввод номера банковской карты
-    await bot.send_message(callback_query.from_user.id, 'Введите номер банковской карты:')
-
-
-@dp.message_handler(regexp=r'^\d{4}\s\d{4}\s\d{4}\s\d{4}$')
-async def process_bank_card_number(message: types.Message):
-    # Проверяем, что пользователь ввел 16 цифр, разделенных пробелами
-    card_number = message.text
-
-    # Удаляем пробелы из номера карты
-    card_number = card_number.replace(' ','')
-
-    # Отправляем сообщение с подтверждением ввода номера банковской карты
-    await bot.send_message(message.chat.id, f'Вы успешно ввели номер банковской карты: {card_number}')
 
 
 @dp.callback_query_handler(text="return_to_admin_panel")

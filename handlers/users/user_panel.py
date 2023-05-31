@@ -21,6 +21,13 @@ async def cmd_start(message: types.Message):
 
     await Get_Goods_Page.first()
 
+# @dp.message_handler()
+# async def ggggg(message: types.Message):
+#     print(message.text)
+#
+# @dp.message_handler(state='*')
+# async def ggggg_state(message: types.Message, state: FSMContext):
+#     print(message.text, await state.get_state())
 
 @dp.message_handler(text='Каталог', state=Get_Goods_Page.page)
 async def send_catalog_start(message: types.Message, state: FSMContext):
@@ -97,11 +104,13 @@ async def return_to_catalog(message: types.Message, state: FSMContext):
 
 @dp.message_handler(text="Перейти в корзину")
 async def go_to_cart(message: types.Message):
-    await show_cart(message)
+    await show_cart()
 
 
-@dp.message_handler(text='Корзина')
-async def show_cart(message: types.Message):
+@dp.message_handler(text='Корзина', state=Get_Goods_Page.page)
+async def show_cart(message: types.Message, state: FSMContext):
+    # Этот метод вызывается, когда пользователь нажимает на кнопку 'Корзина'.
+    # message = callback_query.message
     print('Я в корзине')
     user_id = message.from_user.id
     cart = await get_cart(user_id)

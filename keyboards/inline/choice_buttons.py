@@ -6,14 +6,16 @@ from aiogram.utils.callback_data import CallbackData
 import os
 
 
-
 main = ReplyKeyboardMarkup(resize_keyboard=True)
 main.add(KeyboardButton('Каталог'))
 main.add(KeyboardButton('Корзина'))
 main.add(KeyboardButton('Контакты'))
 
 main_admin = ReplyKeyboardMarkup(resize_keyboard=True)
-main_admin.add('Каталог').add('Корзина').add('Контакты').add('Админ-панель')
+main_admin.add(KeyboardButton('Каталог'))
+main_admin.add(KeyboardButton('Корзина'))
+main_admin.add('Контакты')
+main_admin.add('Админ-панель')
 
 admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
 admin_panel.add(KeyboardButton('Добавить товар'))
