@@ -1,7 +1,8 @@
 import uuid
 
-from utils.connect_db import con, cursor_obj
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+from utils.connect_db import con, cursor_obj
 
 
 async def create_table():
@@ -46,8 +47,16 @@ async def create_table():
     con.commit()
 
 
-async def add_good_to_db(name, description, price, photo):
-    cursor_obj.execute(f"""INSERT INTO goods VALUES ('{name}', '{description}', {price}, '{photo}') 
+async def create_table():
+    cursor_obj.execute("""CREATE TABLE IF NOT EXISTS categories (
+           category_name VARCHAR(200) NOT NULL,
+           category_id INT GENERATED ALWAYS AS IDENTITY);""")
+
+    con.commit()
+
+
+async def add_good_to_db(name, description, price, photo, category_id):
+    cursor_obj.execute(f"""INSERT INTO goods VALUES ('{name}', '{description}', {price}, '{photo}', {category_id}) 
     ON CONFLICT DO NOTHING;""")
 
     con.commit()
@@ -104,8 +113,8 @@ async def get_bank_card(user_id):
 
 
 async def save_order(user_id, fio, phone_number, delivery_method, payment_method, order_number):
-    cursor_obj.execute(f"""INSERT INTO orders (user_id, fio, phone_number, delivery_method, payment_method, order_number) VALUES ({fio}, {phone_number},
-    {delivery_method}, {payment_method}, {order_number}
+    cursor_obj.execute(f"""INSERT INTO orders (user_id, fio, phone_number, delivery_method, payment_method, order_number) VALUES ('{fio}', {phone_number},
+    '{delivery_method}', '{payment_method}', {order_number}
 """)
 
     con.commit()
@@ -115,6 +124,30 @@ async def get_order(user_id):
     cursor_obj.execute(f"""SELECT fio, phone_number, delivery_method, payment_method, order_number FROM orders WHERE user_id={user_id}""")
 
     return cursor_obj.fetchone()
+
+
+async def set_category(category_name):
+    cursor_obj.execute(f"""INSERT INTO categories VALUES ('{category_name}') 
+        ON CONFLICT DO NOTHING;""")
+
+    con.commit()
+
+
+async def get_categories_from_db():
+    cursor_obj.execute("""SELECT category_name, category_id FROM categories;""")
+
+    return cursor_obj.fetchall()
+
+
+async def generate_categories_keyboard():
+    categories = await get_categories_from_db()  # получаем список категорий из базы данных
+    categories_keyboard = InlineKeyboardMarkup()
+
+    for category in categories:
+        category_name = category[0]  # получаем имя категории из кортежа
+        categories_keyboard.add(InlineKeyboardButton(category_name, callback_data=f"category:{category_name}"))
+
+    return categories_keyboard
 
 
 def generate_order_number():

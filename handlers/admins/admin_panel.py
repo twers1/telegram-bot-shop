@@ -6,8 +6,9 @@ from aiogram.dispatcher import FSMContext
 
 from keyboards.inline.choice_buttons import admin_panel, keyboard
 from loader import dp, bot
-from states import NewItem, Get_Goods_Page, BankCardState
-from utils.db_functions import add_good_to_db, remove_good_from_db, save_bank_card, get_bank_card
+from states import NewItem, Get_Goods_Page, BankCardState, NewCategory
+from utils.db_functions import add_good_to_db, remove_good_from_db, save_bank_card, get_bank_card, set_category, \
+    generate_categories_keyboard
 from utils.inline_keyboards import get_all_goods_keyboard
 
 
@@ -22,12 +23,46 @@ async def contacts(message: types.Message, state: FSMContext):
         await Get_Goods_Page.page.set()
 
 
+@dp.message_handler(text="Добавить категорию", state=Get_Goods_Page.page)
+async def add_category(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        await bot.delete_message(message_id=data["key"], chat_id=message.from_user.id)
+        await bot.send_message(message.from_user.id, "<b>Введите название категории: </b>")
+
+    await state.reset_state()
+    await NewCategory.first()
+
+
+@dp.message_handler(state=NewCategory.name)
+async def get_category_name(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data["name"] = message.text
+
+    state_data = await state.get_data()
+    name = state_data["name"]
+
+    await message.answer("<b>Категория успешно добавлена!</b>", reply_markup=admin_panel)
+
+    await set_category(name)
+    await state.reset_state()
+
+    await Get_Goods_Page.first()
+
+
 @dp.message_handler(text="Добавить товар", state=Get_Goods_Page.page)
 async def add_good(message: types.Message, state: FSMContext):
+    category_keyboard = await generate_categories_keyboard()
+
+    await bot.send_message(message.from_user.id, "<b>Выберите категорию:</b>", reply_markup=category_keyboard)
+
+    await state.reset_state()
+    await NewItem.first()
+
+
+@dp.message_handler(state=Get_Goods_Page.page)
+async def add_good(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        print(type(data["key"]))
-        await bot.delete_message(message_id=data["key"], chat_id=message.from_user.id)
-        await bot.send_message(message.from_user.id, "<b>Введите название товара: </b>", reply_markup=None)
+        data["category"] = message.text
 
     await state.reset_state()
     await NewItem.first()
@@ -67,6 +102,7 @@ async def get_photo(message: types.Message, state: FSMContext):
         data["photo"] = message.text
 
     state_data = await state.get_data()
+    category = state_data["category"]
     name = state_data["name"]
     description = state_data["description"]
     price = state_data["price"]
@@ -74,7 +110,7 @@ async def get_photo(message: types.Message, state: FSMContext):
 
     await message.answer("<b>Товар успешно добавлен!</b>", reply_markup=admin_panel)
 
-    await add_good_to_db(name, description, price, photo)
+    await add_good_to_db(category, name, description, price, photo)
     await state.reset_state()
 
     await Get_Goods_Page.first()

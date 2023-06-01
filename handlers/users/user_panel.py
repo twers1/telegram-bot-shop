@@ -146,12 +146,14 @@ async def order_start(message: types.Message, state: FSMContext):
     await message.answer('Введите свое ФИО:')
     await YourForm.name.set()
 
+
 @dp.message_handler(state=YourForm.name)
 async def process_name(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['fio'] = message.text
     await message.answer('Введите номер телефона:')
     await YourForm.next()
+
 
 @dp.message_handler(state=YourForm.phone)
 async def process_phone(message: types.Message, state: FSMContext):
@@ -160,12 +162,14 @@ async def process_phone(message: types.Message, state: FSMContext):
     await message.answer('Выберите метод доставки:', reply_markup=delivery_keyboard)
     await YourForm.next()
 
+
 @dp.message_handler(state=YourForm.delivery)
 async def process_delivery(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['delivery_method'] = message.text
     await message.answer('Выберите метод оплаты:', reply_markup=payment_keyboard)
     await YourForm.next()
+
 
 @dp.message_handler(state=YourForm.payment)
 async def process_payment(message: types.Message, state: FSMContext):
@@ -180,7 +184,7 @@ async def process_payment(message: types.Message, state: FSMContext):
 
 @dp.message_handler(text='Контакты', state=Get_Goods_Page.page)
 async def contacts(message: types.Message, state: FSMContext):
-    await message.answer(f'Покупать товар у него: @123456')
+    await message.answer('Контакт для связи [Алексей](https://t.me/pal1maaaa)', parse_mode='Markdown')
 
 
 @dp.message_handler()

@@ -18,6 +18,7 @@ main_admin.add('Контакты')
 main_admin.add('Админ-панель')
 
 admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
+admin_panel.add(KeyboardButton('Добавить категорию'))
 admin_panel.add(KeyboardButton('Добавить товар'))
 admin_panel.add(KeyboardButton('Удалить товар'))
 admin_panel.add(KeyboardButton('Реквизиты банковской карты'))
