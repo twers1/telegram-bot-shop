@@ -48,7 +48,9 @@ cart_markup.add(KeyboardButton(text='Очистить корзину'))
 cart_markup.add(KeyboardButton('Заказать'))
 
 show_cart_all = ReplyKeyboardMarkup(resize_keyboard=True)
-show_cart_all.add(KeyboardButton(text='Перейти в корзину'))
+show_cart_all.add(InlineKeyboardButton(text='➕', callback_data='add_one_more'))
+show_cart_all.add(InlineKeyboardButton(text='➖', callback_data='remove_from_cart'))
+show_cart_all.add(InlineKeyboardButton(text='Перейти в корзину'))
 
 # exit_to_admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
 # exit_to_admin_panel.add(KeyboardButton(text="Вернуться в админ-панель"))

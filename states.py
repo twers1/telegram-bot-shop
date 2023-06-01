@@ -8,6 +8,7 @@ class Puchase(StatesGroup):
 
 
 class NewItem(StatesGroup):
+    category = State()
     name = State()
     description = State()
     price = State()

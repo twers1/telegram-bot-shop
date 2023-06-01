@@ -150,6 +150,14 @@ async def generate_categories_keyboard():
     return categories_keyboard
 
 
+async def update_good_card(message, good_name, good_description, good_price, good_image, user_id):
+    # получаем информацию о количестве товаров в корзине пользователя
+    cart_count = await get_cart_count(user_id)
+
+    # обновляем карточку товара с новой клавиатурой и информацией
+    await bot.edit_message_media(media=types.InputMediaPhoto(good_image, caption=f"{good_name}\n{good_description}\n{good_price} руб."), chat_id=message.chat.id, message_id=message.message_id, reply_markup=inline_keyboard)
+
+
 def generate_order_number():
     """Генерирует уникальный номер для заказа"""
     return str(uuid.uuid4())

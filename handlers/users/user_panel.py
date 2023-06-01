@@ -99,6 +99,35 @@ async def process_add_to_cart(callback_query: types.CallbackQuery, state: FSMCon
     await bot.send_message(callback_query.from_user.id, text='Товар добавлен в корзину.', reply_markup=show_cart_all)
 
 
+@dp.callback_query_handler(lambda callback_query: 'add_one_more' in callback_query.data)
+async def add_one_more_to_cart(callback_query: types.CallbackQuery):
+    # Получаем информацию о товаре из базы данных
+    good_id = int(callback_query.data.split(":")[1])
+    good_information = await get_good_from_db(good_id)
+    good_name, good_description, good_price, good_image = good_information
+
+    # Добавляем товар в корзину
+    await add_good_to_cart(callback_query.from_user.id, good_id)
+
+    # Отправляем сообщение об успешном добавлении и обновляем карточку товара с новым количеством товаров в корзине
+    await bot.answer_callback_query(callback_query.id, text=f"Товар '{good_name}' успешно добавлен в корзину!")
+    await update_good_card(callback_query.message, good_name, good_description, good_price, good_image, callback_query.from_user.id)
+
+@dp.callback_query_handler(lambda callback_query: 'remove_from_cart' in callback_query.data)
+async def remove_from_cart(callback_query: types.CallbackQuery):
+    # Получаем информацию о товаре из базы данных
+    good_id = int(callback_query.data.split(":")[1])
+    good_information = await get_good_from_db(good_id)
+    good_name, good_description, good_price, good_image = good_information
+
+    # Удаляем товар из корзины
+    await remove_good_from_cart(callback_query.from_user.id, good_id)
+
+    # Отправляем сообщение об успешном удалении и обновляем карточку товара с новым количеством товаров в корзине
+    await bot.answer_callback_query(callback_query.id, text=f"Товар '{good_name}' успешно удален из корзины!")
+    await update_good_card(callback_query.message, good_name, good_description, good_price, good_image, callback_query.from_user.id)
+
+
 @dp.callback_query_handler(lambda c: c.data and c.data.startswith('return_to_menu'))
 async def return_to_catalog(message: types.Message, state: FSMContext):
     await send_catalog_start(message, state)
