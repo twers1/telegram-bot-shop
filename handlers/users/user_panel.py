@@ -8,7 +8,7 @@ from keyboards.inline.choice_buttons import main, main_admin, show_cart_all, car
 from loader import dp
 import os
 
-from states import Get_Goods_Page
+from states import Get_Goods_Page, YourForm
 from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number
 from utils.inline_keyboards import get_all_goods_keyboard
 from utils.db_functions import get_cart, add_good_to_cart
@@ -141,32 +141,41 @@ async def process_clear_cart(message: types.Message):
     await bot.send_message(message.chat.id, text='Корзина пуста!', reply_markup=main)
 
 
-@dp.message_handler(text='Заказать')
-async def order_start(message: types.Message):
-    user_id = message.from_user.id
-    # Просим пользователя ввести ФИО и сохраняем в базу данных
-    await bot.send_message(message.chat.id, 'Введите свое ФИО:')
-    fio = (await bot.wait_for('message')).text
+@dp.message_handler(text='Заказать', state=Get_Goods_Page.page)
+async def order_start(message: types.Message, state: FSMContext):
+    await message.answer('Введите свое ФИО:')
+    await YourForm.name.set()
 
-    # Просим пользователя ввести номер телефона и сохраняем в базу данных
-    await bot.send_message(message.chat.id, 'Введите номер телефона:')
-    phone_number = (await bot.wait_for('message')).text
+@dp.message_handler(state=YourForm.name)
+async def process_name(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['fio'] = message.text
+    await message.answer('Введите номер телефона:')
+    await YourForm.next()
 
-    # Просим пользователя выбрать метод доставки и сохраняем в базу данных
-    await bot.send_message(message.chat.id, 'Выберите метод доставки:', reply_markup=delivery_keyboard)
-    delivery_method = (await bot.wait_for('message')).text
+@dp.message_handler(state=YourForm.phone)
+async def process_phone(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['phone_number'] = message.text
+    await message.answer('Выберите метод доставки:', reply_markup=delivery_keyboard)
+    await YourForm.next()
 
-    # Просим пользователя выбрать метод оплаты и сохраняем в базу данных
-    await bot.send_message(message.chat.id, 'Выберите метод оплаты:', reply_markup=payment_keyboard)
-    payment_method = (await bot.wait_for('message')).text
+@dp.message_handler(state=YourForm.delivery)
+async def process_delivery(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['delivery_method'] = message.text
+    await message.answer('Выберите метод оплаты:', reply_markup=payment_keyboard)
+    await YourForm.next()
 
+@dp.message_handler(state=YourForm.payment)
+async def process_payment(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['payment_method'] = message.text
+
+    state_data = await state.get_data()
     order_number = generate_order_number()
-    await save_order(user_id, fio, phone_number, delivery_method, payment_method, order_number)
-
-
-# @dp.message_handler(text='СДЭК')
-# async def cdek(message: types.Message):
-#     user_id=message.from_user.id
+    await save_order(message.from_user.id, state_data['fio'], state_data['phone_number'], state_data['delivery_method'], state_data['payment_method'], order_number)
+    await state.finish()
 
 
 @dp.message_handler(text='Контакты', state=Get_Goods_Page.page)

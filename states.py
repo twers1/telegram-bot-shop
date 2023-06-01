@@ -21,3 +21,9 @@ class Get_Goods_Page(StatesGroup):
 class BankCardState(StatesGroup):
     waiting_for_bank_card = State()
 
+
+class YourForm(StatesGroup):
+    name = State()
+    phone = State()
+    delivery = State()
+    payment = State()
