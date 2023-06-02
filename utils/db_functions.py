@@ -1,10 +1,8 @@
-import uuid
-
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
 from utils.connect_db import con, cursor_obj
 
-from typing import List, Tuple
+import time
+import random
 
 
 async def create_table():
@@ -135,9 +133,9 @@ async def get_bank_card(user_id):
 
 
 async def save_order(user_id, fio, phone_number, delivery_method, payment_method, order_number):
-    cursor_obj.execute(f"""INSERT INTO orders (user_id, fio, phone_number, delivery_method, payment_method, order_number) VALUES ('{fio}', {phone_number},
-    '{delivery_method}', '{payment_method}', {order_number}
-""")
+    cursor_obj.execute("INSERT INTO orders (user_id, fio, phone_number, delivery_method, payment_method, order_number) \
+                            VALUES (%s, %s, %s, %s, %s, %s)",
+                       (user_id, fio, phone_number, delivery_method, payment_method, order_number))
 
     con.commit()
 
@@ -201,4 +199,6 @@ async def get_category_id_by_name(category_name):
 
 def generate_order_number():
     """Генерирует уникальный номер для заказа"""
-    return str(uuid.uuid4())
+    random_num = random.randint(0, 999)  # Generate a random number between 0 and 999
+    order_number = int(f"{random_num:03d}")  # Combine timestamp and random number
+    return order_number

@@ -230,8 +230,16 @@ async def process_payment(message: types.Message, state: FSMContext):
 
     state_data = await state.get_data()
     order_number = generate_order_number()
-    await save_order(message.from_user.id, state_data['fio'], state_data['phone_number'], state_data['delivery_method'], state_data['payment_method'], order_number)
+    fio = state_data['fio']
+    phone_number = state_data['phone_number']
+    delivery_method = state_data['delivery_method']
+    payment_method = state_data['payment_method']
+
+    await save_order(message.from_user.id, fio, phone_number, delivery_method, payment_method, order_number)
+    await message.answer("<b>Заказ успешно создан!</b>", reply_markup=main)
     await state.finish()
+
+    # НАПИСАТЬ ЛОГИКУ УДАЛЕНИЕ КОРЗИНЫ, КОГДА ПОЛЬЗОВАТЕЛЬ ОФОРМИЛ ЗАКАЗ!!
 
 
 @dp.message_handler(text='Контакты', state=Get_Goods_Page.page)
