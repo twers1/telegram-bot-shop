@@ -11,6 +11,7 @@ async def create_table():
     description VARCHAR(200) NOT NULL,
     price INT NOT NULL,
     photo VARCHAR(300) NOT NULL,
+    category_id INT, 
     id INT GENERATED ALWAYS AS IDENTITY);""")
 
     con.commit()
@@ -20,6 +21,7 @@ async def create_table():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS carts (
            user_id INT NOT NULL,
            good_id INT NOT NULL,
+           parent_id INT NOT NULL,
            id INT GENERATED ALWAYS AS IDENTITY);""")
 
     con.commit()
@@ -55,9 +57,27 @@ async def create_table():
     con.commit()
 
 
+async def add_category_to_db(category_name):
+    # Добавляем категорию в таблицу categories
+    cursor_obj.execute("INSERT INTO categories (category_name) \
+                        VALUES (%s)", (category_name,))
+    con.commit()
+
+
+async def update_goods_category_id():
+    # Обновляем столбец category_id в таблице goods на основе столбца category_name в таблице categories
+    cursor_obj.execute("UPDATE goods SET category_id = categories.category_id FROM categories WHERE categories.category_name = goods.category_name")
+    con.commit()
+
+
 async def add_good_to_db(name, description, price, photo, category_id):
-    cursor_obj.execute(f"""INSERT INTO goods VALUES ('{name}', '{description}', {price}, '{photo}', {category_id}) 
-    ON CONFLICT DO NOTHING;""")
+    # Получаем id категории по ее названию
+    cursor_obj.execute(f"""SELECT category_id FROM categories WHERE category_id='{category_id}'""")
+
+    # Добавляем товар в таблицу goods, указывая id категории
+    cursor_obj.execute("INSERT INTO goods (name, description, price, photo, category_id) \
+                        VALUES (%s, %s, %s, %s, %s)",
+                       (name, description, price, photo, category_id))
 
     con.commit()
 
@@ -144,8 +164,11 @@ async def generate_categories_keyboard():
     categories_keyboard = InlineKeyboardMarkup()
 
     for category in categories:
+
         category_name = category[0]  # получаем имя категории из кортежа
-        categories_keyboard.add(InlineKeyboardButton(category_name, callback_data=f"category:{category_name}"))
+        category_id = category[1]
+        categories_keyboard.add(InlineKeyboardButton(category_name, callback_data=f"category_id:{category_id}"))
+        print(category_id, category_name)
 
     return categories_keyboard
 

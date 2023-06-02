@@ -34,9 +34,10 @@ async def cmd_start(message: types.Message):
 @dp.message_handler(text='Каталог', state=Get_Goods_Page.page)
 async def send_catalog_start(message: types.Message, state: FSMContext):
     keyboards = await get_all_goods_keyboard("get")
+    print(keyboards.keys())
 
     await bot.send_message(text="<b>Каталог товаров: </b>", chat_id=message.from_user.id)
-    await bot.send_message(text="Доступные товары представлены тут", reply_markup=keyboards[1], chat_id=message.from_user.id)
+    await bot.send_message(text="Категории товаров", reply_markup=keyboards[1], chat_id=message.from_user.id)
 
     async with state.proxy() as data:
         data["keyboards"] = keyboards

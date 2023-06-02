@@ -4,7 +4,7 @@ from aiogram.types import Message
 
 from loader import dp
 from states import BankCardState
-from utils.db_functions import get_all_goods
+from utils.db_functions import get_all_goods, get_categories_from_db
 
 get_good_callback = CallbackData("get_good", "id")
 remove_good_callback = CallbackData("remove_good", "id")
@@ -24,9 +24,10 @@ async def get_all_goods_keyboard(mode):
         callback = remove_good_callback
 
     for name, description, id in goods:
+        print(all_goods_keyboards)
         all_buttons.append(InlineKeyboardButton(text=f"{name} | {description}", callback_data=callback.new(id)))
 
-    while len(all_buttons) > 1:
+    while len(all_buttons) > 0:
         keyboard = InlineKeyboardMarkup()
         counter = 1
 
@@ -60,6 +61,17 @@ async def get_all_goods_keyboard(mode):
             page += 1
 
     return all_goods_keyboards
+
+
+async def get_all_categories_keyboard():
+    all_categories_keyboards = {}
+    all_buttons = []
+    categories = await get_categories_from_db()
+
+    for category in categories:
+        all_buttons.append(InlineKeyboardButton(text=category, callback_data=f"category_{category}"))
+
+    page = 1
 
 
 # async def add_good_to_cart(message: Message):

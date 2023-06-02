@@ -59,13 +59,14 @@ async def add_good(message: types.Message, state: FSMContext):
     await NewItem.category.set()
 
 
-@dp.message_handler(state=NewItem.category)
-async def get_category(message: types.Message, state: FSMContext):
+@dp.callback_query_handler(state=NewItem.category)
+async def get_category(callback: types.CallbackQuery, state: FSMContext):
     print('Категория выбрана')
-    await message.answer("<b>Введите название товара:</b>")
+    await callback.message.answer("<b>Введите название товара:</b>")
 
     async with state.proxy() as data:
-        data["category"] = message.text
+        print(callback.data)
+        data["category_id"] = callback.data.split(':')[1]
 
     await NewItem.name.set()
 
@@ -104,7 +105,8 @@ async def get_photo(message: types.Message, state: FSMContext):
         data["photo"] = message.text
 
     state_data = await state.get_data()
-    category = state_data["category"]
+    # category_id = state_data["category"].split(":")[1]
+    category_id = int(state_data["category_id"])
     name = state_data["name"]
     description = state_data["description"]
     price = state_data["price"]
@@ -112,8 +114,7 @@ async def get_photo(message: types.Message, state: FSMContext):
 
     await message.answer("<b>Товар успешно добавлен!</b>", reply_markup=admin_panel)
 
-    await set_category(category)
-    await add_good_to_db(category, name, description, price, photo)
+    await add_good_to_db(name, description, price, photo, category_id)
 
     await state.reset_state()
     await Get_Goods_Page.first()
