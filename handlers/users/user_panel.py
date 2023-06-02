@@ -9,8 +9,8 @@ from loader import dp
 import os
 
 from states import Get_Goods_Page, YourForm
-from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number
-from utils.inline_keyboards import get_all_goods_keyboard
+from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number, get_category_id_by_name
+from utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_keyboard
 from utils.db_functions import get_cart, add_good_to_cart
 
 @dp.message_handler(commands=['start'])
@@ -33,14 +33,14 @@ async def cmd_start(message: types.Message):
 
 @dp.message_handler(text='Каталог', state=Get_Goods_Page.page)
 async def send_catalog_start(message: types.Message, state: FSMContext):
-    keyboards = await get_all_goods_keyboard("get")
-    print(keyboards.keys())
+    keyboards_category = await get_all_categories_keyboard("get")
+    print(keyboards_category.keys())
 
-    await bot.send_message(text="<b>Каталог товаров: </b>", chat_id=message.from_user.id)
-    await bot.send_message(text="Категории товаров", reply_markup=keyboards[1], chat_id=message.from_user.id)
+    await bot.send_message(text="<b>🎉 Добро пожаловать в каталог товаров!</b>", chat_id=message.from_user.id)
+    await bot.send_message(text="Категории товаров", reply_markup=keyboards_category[1], chat_id=message.from_user.id)
 
     async with state.proxy() as data:
-        data["keyboards"] = keyboards
+        data["keyboards"] = keyboards_category
         data["page"] = 1
 
 
@@ -70,11 +70,33 @@ async def send_previous_page(message: types.Message, state: FSMContext):
     await bot.message.edit_reply_markup(reply_markup=keyboards[page])
 
 
+@dp.callback_query_handler(text_contains="get_category", state=Get_Goods_Page.page)
+async def send_cart_good(message: types.Message, state: FSMContext):
+    category_name = message.data.split(":")[1]
+    category_id = get_category_id_by_name(category_name)
+    keyboards_goods = await get_all_goods_keyboard("get", category_id)
+    print('Получаем ключ от товаров')
+    print(keyboards_goods.keys())
+
+    await bot.send_message(text="<b>Товары в категории </b>", chat_id=message.from_user.id)
+    await bot.send_message(text="Выберите товар", reply_markup=keyboards_goods[1], chat_id=message.from_user.id)
+
+    async with state.proxy() as data:
+        data["keyboards"] = keyboards_goods
+        data["page"] = 1
+
+
 @dp.callback_query_handler(text_contains="get_good", state=Get_Goods_Page.page)
 async def send_good(callback: types.CallbackQuery, state: FSMContext):
     callback_data = callback.data.strip().split(":")[1:]
     good_id = int(callback_data[0])
     good_information = await get_good_from_db(good_id)
+
+    if good_information is None:
+        await callback.answer(text="Извините, запрашиваемый товар в данный момент недоступен.",
+                               ) # chat_id=callback.message.from_user.id
+        return
+
     good_name, good_description, good_price, good_image = good_information
     price = [LabeledPrice(label=f"{good_name} | {good_description}", amount=good_price)]
 

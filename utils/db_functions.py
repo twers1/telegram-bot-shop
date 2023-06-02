@@ -4,6 +4,8 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from utils.connect_db import con, cursor_obj
 
+from typing import List, Tuple
+
 
 async def create_table():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS goods (
@@ -179,6 +181,22 @@ async def update_good_card(message, good_name, good_description, good_price, goo
 
     # обновляем карточку товара с новой клавиатурой и информацией
     await bot.edit_message_media(media=types.InputMediaPhoto(good_image, caption=f"{good_name}\n{good_description}\n{good_price} руб."), chat_id=message.chat.id, message_id=message.message_id, reply_markup=inline_keyboard)
+
+
+async def get_goods_by_category_from_db(category_id):
+    category_id_value = await category_id
+    cursor_obj.execute("SELECT name, description, id FROM goods WHERE category_id = %s;", (category_id_value,))
+    return cursor_obj.fetchall()
+
+
+async def get_category_id_by_name(category_name):
+    cursor_obj.execute("SELECT category_id FROM categories WHERE category_name = %s;", (category_name,))
+    result = cursor_obj.fetchone()
+
+    if result is None:
+        return None
+
+    return result[0]
 
 
 def generate_order_number():
