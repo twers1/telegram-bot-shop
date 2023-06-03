@@ -1,4 +1,4 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, inline_keyboard
 from utils.connect_db import con, cursor_obj
 
 import time
@@ -174,14 +174,6 @@ async def generate_categories_keyboard():
     return categories_keyboard
 
 
-async def update_good_card(message, good_name, good_description, good_price, good_image, user_id):
-    # получаем информацию о количестве товаров в корзине пользователя
-    cart_count = await get_cart_count(user_id)
-
-    # обновляем карточку товара с новой клавиатурой и информацией
-    await bot.edit_message_media(media=types.InputMediaPhoto(good_image, caption=f"{good_name}\n{good_description}\n{good_price} руб."), chat_id=message.chat.id, message_id=message.message_id, reply_markup=inline_keyboard)
-
-
 async def get_category_id_by_name(category_name):
     cursor_obj.execute("SELECT category_id FROM categories WHERE category_name = %s;", (category_name,))
 
@@ -190,6 +182,11 @@ async def get_category_id_by_name(category_name):
 
 async def get_goods_by_category_from_db(category_id):
     cursor_obj.execute("SELECT name, description, id FROM goods WHERE category_id = %s", (category_id,))
+    return cursor_obj.fetchall()
+
+
+async def get_cart_items_count(user_id):
+    cursor_obj.execute("SELECT COUNT(*) FROM carts WHERE user_id = %s", (user_id,))
     return cursor_obj.fetchall()
 
 

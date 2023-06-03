@@ -1,10 +1,13 @@
-from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from aiogram import types
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, inline_keyboard
 from aiogram.utils.callback_data import CallbackData
 from aiogram.types import Message
+from loader import bot
 
 from loader import dp
 from states import BankCardState
-from utils.db_functions import get_all_goods, get_categories_from_db, get_goods_by_category_from_db
+from utils.db_functions import get_all_goods, get_categories_from_db, get_goods_by_category_from_db, \
+    get_cart_items_count
 
 get_category_callback = CallbackData("get_category", "category_id")
 remove_category_callback = CallbackData("remove_category", "category_id")
@@ -116,6 +119,14 @@ async def get_all_goods_keyboard(mode, category_id):
             page += 1
 
     return all_goods_keyboards
+
+
+async def update_good_card(message, good_name, good_description, good_price, good_image, user_id):
+    # получаем информацию о количестве товаров в корзине пользователя
+    cart_count = await get_cart_items_count(user_id)
+
+    # обновляем карточку товара с новой клавиатурой и информацией
+    await bot.edit_message_media(media=types.InputMediaPhoto(good_image, caption=f"{good_name}\n{good_description}\n{good_price} руб."), chat_id=message.chat.id, message_id=message.message_id, reply_markup=inline_keyboard)
 
 
 # async def add_good_to_cart(message: Message):
