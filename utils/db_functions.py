@@ -40,7 +40,7 @@ async def create_table():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS orders (
            user_id INT NOT NULL,
            fio VARCHAR(200) NOT NULL,
-           phone_number INT NOT NULL,
+           phone_number bigint NOT NULL,
            delivery_method TEXT NOT NULL,
            payment_method TEXT NOT NULL, 
            order_number INT NOT NULL,
@@ -133,6 +133,7 @@ async def get_bank_card(user_id):
 
 
 async def save_order(user_id, fio, phone_number, delivery_method, payment_method, order_number):
+    cursor_obj.execute("ALTER TABLE orders ALTER COLUMN phone_number TYPE bigint;")
     cursor_obj.execute("INSERT INTO orders (user_id, fio, phone_number, delivery_method, payment_method, order_number) \
                             VALUES (%s, %s, %s, %s, %s, %s)",
                        (user_id, fio, phone_number, delivery_method, payment_method, order_number))
@@ -181,20 +182,15 @@ async def update_good_card(message, good_name, good_description, good_price, goo
     await bot.edit_message_media(media=types.InputMediaPhoto(good_image, caption=f"{good_name}\n{good_description}\n{good_price} руб."), chat_id=message.chat.id, message_id=message.message_id, reply_markup=inline_keyboard)
 
 
-async def get_goods_by_category_from_db(category_id):
-    category_id_value = await category_id
-    cursor_obj.execute("SELECT name, description, id FROM goods WHERE category_id = %s;", (category_id_value,))
+async def get_category_id_by_name(category_name):
+    cursor_obj.execute("SELECT category_id FROM categories WHERE category_name = %s;", (category_name,))
+
     return cursor_obj.fetchall()
 
 
-async def get_category_id_by_name(category_name):
-    cursor_obj.execute("SELECT category_id FROM categories WHERE category_name = %s;", (category_name,))
-    result = cursor_obj.fetchone()
-
-    if result is None:
-        return None
-
-    return result[0]
+async def get_goods_by_category_from_db(category_id):
+    cursor_obj.execute("SELECT name, description, id FROM goods WHERE category_id = %s", (category_id,))
+    return cursor_obj.fetchall()
 
 
 def generate_order_number():

@@ -7,7 +7,7 @@ from states import BankCardState
 from utils.db_functions import get_all_goods, get_categories_from_db, get_goods_by_category_from_db
 
 get_category_callback = CallbackData("get_category", "category_id")
-remove_good_callback = CallbackData("remove_category", "category_id")
+remove_category_callback = CallbackData("remove_category", "category_id")
 get_good_callback = CallbackData("get_good", "id")
 remove_good_callback = CallbackData("remove_good", "id")
 
@@ -23,7 +23,7 @@ async def get_all_categories_keyboard(mode):
         callback = get_category_callback
 
     elif mode == "remove":
-        callback = remove_good_callback
+        callback = remove_category_callback
 
     for category_name, category_id in categories:
         print(all_categories_keyboards)

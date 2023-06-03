@@ -71,19 +71,23 @@ async def send_previous_page(message: types.Message, state: FSMContext):
 
 
 @dp.callback_query_handler(text_contains="get_category", state=Get_Goods_Page.page)
-async def send_cart_good(message: types.Message, state: FSMContext):
-    category_name = message.data.split(":")[1]
-    category_id = get_category_id_by_name(category_name)
-    keyboards_goods = await get_all_goods_keyboard("get", category_id)
+async def send_cart_good(callback: types.CallbackQuery, state: FSMContext):
+    category_id = callback.data.split(":")[1]  # Извлекаем значение category_id из коллбэк-данных
+    keyboards_goods = await get_all_goods_keyboard("get", category_id=category_id)
     print('Получаем ключ от товаров')
     print(keyboards_goods.keys())
 
-    await bot.send_message(text="<b>Товары в категории </b>", chat_id=message.from_user.id)
-    await bot.send_message(text="Выберите товар", reply_markup=keyboards_goods[1], chat_id=message.from_user.id)
+    await bot.send_message(text="<b>Товары в категории </b>", chat_id=callback.message.chat.id)
+    if len(keyboards_goods) > 0:
+        await bot.send_message(text="Выберите товар", reply_markup=keyboards_goods[list(keyboards_goods.keys())[0]],
+                               chat_id=callback.message.chat.id)
 
-    async with state.proxy() as data:
-        data["keyboards"] = keyboards_goods
-        data["page"] = 1
+        async with state.proxy() as data:
+            data["keyboards"] = keyboards_goods
+            data["page"] = 1
+    else:
+        await bot.send_message(text="В данной категории нет товаров.", chat_id=callback.message.chat.id)
+        await state.reset_state()
 
 
 @dp.callback_query_handler(text_contains="get_good", state=Get_Goods_Page.page)
@@ -234,12 +238,13 @@ async def process_payment(message: types.Message, state: FSMContext):
     phone_number = state_data['phone_number']
     delivery_method = state_data['delivery_method']
     payment_method = state_data['payment_method']
+    user_id = message.from_user.id
 
     await save_order(message.from_user.id, fio, phone_number, delivery_method, payment_method, order_number)
-    await message.answer("<b>Заказ успешно создан!</b>", reply_markup=main)
+    await delete_cart(user_id)
+    await message.answer("<b>Заказ успешно создан!</b>")
     await state.finish()
 
-    # НАПИСАТЬ ЛОГИКУ УДАЛЕНИЕ КОРЗИНЫ, КОГДА ПОЛЬЗОВАТЕЛЬ ОФОРМИЛ ЗАКАЗ!!
 
 
 @dp.message_handler(text='Контакты', state=Get_Goods_Page.page)
