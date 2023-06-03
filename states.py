@@ -13,6 +13,7 @@ class NewItem(StatesGroup):
     description = State()
     price = State()
     photo = State()
+    availability = State()
 
 
 class Get_Goods_Page(StatesGroup):

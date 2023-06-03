@@ -4,6 +4,7 @@ import re
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
+from handlers.users.user_panel import cmd_start
 from keyboards.inline.choice_buttons import admin_panel, keyboard
 from loader import dp, bot
 from states import NewItem, Get_Goods_Page, BankCardState, NewCategory
@@ -101,20 +102,28 @@ async def get_name(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=NewItem.photo)
 async def get_photo(message: types.Message, state: FSMContext):
+    await message.answer("<b>Введите количество товара в наличии: </b>")
     async with state.proxy() as data:
         data["photo"] = message.text
+    await NewItem.next()
+
+
+@dp.message_handler(state=NewItem.availability)
+async def get_availability(message:types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data["availability"] = int(message.text)
 
     state_data = await state.get_data()
-    # category_id = state_data["category"].split(":")[1]
     category_id = int(state_data["category_id"])
     name = state_data["name"]
     description = state_data["description"]
     price = state_data["price"]
     photo = state_data["photo"]
+    availability = state_data["availability"]
 
     await message.answer("<b>Товар успешно добавлен!</b>", reply_markup=admin_panel)
 
-    await add_good_to_db(name, description, price, photo, category_id)
+    await add_good_to_db(name, description, price, photo, category_id, availability)
 
     await state.reset_state()
     await Get_Goods_Page.first()
@@ -192,22 +201,9 @@ async def prepayment_amount(message: types.Message, state:FSMContext):
         await message.answer("Номер вашей банковской карты не найден.", reply_markup=admin_panel)
 
 
-# @dp.message_handler(text="Вернуться в админ-панель")
-# async def exit_admin(message: types.Message, state: FSMContext):
-#     await contacts(message, state)
-
-
-# @dp.callback_query_handler(text="return_to_admin_panel")
-# async def return_to_admin_menu(callback: types.CallbackQuery):
-#     await callback.message.delete()
-#     await contacts(callback.message)
-#
-#
-# @dp.callback_query_handler(text="exit_from_admin_panel", state=Get_Goods_Page.page)
-# async def exit_from_admin_panel(callback: types.CallbackQuery, state: FSMContext):
-#     await callback.message.delete()
-#
-#     await state.reset_state()
+@dp.message_handler(text="Выйти", state=Get_Goods_Page.page)
+async def return_to_lobby(message: types.Message, state: FSMContext):
+    await cmd_start(message)
 
 
 

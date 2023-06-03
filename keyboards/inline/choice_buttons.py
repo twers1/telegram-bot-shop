@@ -23,13 +23,11 @@ admin_panel.add(KeyboardButton('Добавить товар'))
 admin_panel.add(KeyboardButton('Удалить товар'))
 admin_panel.add(KeyboardButton('Реквизиты банковской карты'))
 admin_panel.add(KeyboardButton('Размер предоплаты'))
-# admin_panel.add(KeyboardButton(text="Выйти"))
+admin_panel.add(KeyboardButton(text="Выйти"))
 
 button = InlineKeyboardButton('Введите номер карты: ', callback_data='bank_card_number')
 keyboard = InlineKeyboardMarkup().add(button)
 
-# return_to_admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
-# return_to_admin_panel.add(InlineKeyboardButton(text="Вернуться в меню", callback_data="return_to_admin_panel"))
 
 delivery_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 delivery_keyboard.add(KeyboardButton('СДЭК'))
@@ -39,19 +37,26 @@ payment_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 payment_keyboard.add(KeyboardButton('Полная оплата'))
 payment_keyboard.add(KeyboardButton('Частичная оплата'))
 
-# add_to_cart = InlineKeyboardButton(text='Добавить в корзину', callback_data=f'add_to_cart')
-# add_to_cart.add = (InlineKeyboardButton(text='Вернуться в меню', callback_data='return_to_menu'))
-
-
 cart_markup = ReplyKeyboardMarkup(resize_keyboard=True)
 cart_markup.add(KeyboardButton(text='Очистить корзину'))
 cart_markup.add(KeyboardButton('Заказать'))
+cart_markup.add(KeyboardButton('Выйти'))
 
-plus = (InlineKeyboardButton(text='➕', callback_data='plus'))
-minus = (InlineKeyboardButton(text='➖', callback_data='minus'))
-return_to_back = (InlineKeyboardButton(text='Перейти в корзину', callback_data='return_to_menu'))
-cart_all = InlineKeyboardMarkup().add(plus).add(minus).add(return_to_back)
 
-# exit_to_admin_panel = ReplyKeyboardMarkup(resize_keyboard=True)
-# exit_to_admin_panel.add(KeyboardButton(text="Вернуться в админ-панель"))
+def generate_cart_all(good_id: int) -> InlineKeyboardMarkup:
+    cart_all = InlineKeyboardMarkup().add(
+        InlineKeyboardButton(text='➕', callback_data=f'good:{good_id}:plus')
+    ).add(
+        InlineKeyboardButton(text='➖', callback_data=f'good:{good_id}:minus')
+    ).add(
+        InlineKeyboardButton(text='Перейти в корзину', callback_data=f'good:{good_id}:return_to_menu')
+    )
+
+    return cart_all
+
+
+return_to_new_state = ReplyKeyboardMarkup(resize_keyboard=True)
+return_to_new_state.add(KeyboardButton(text="Выйти в главное меню"))
+
+
 

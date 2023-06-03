@@ -4,7 +4,7 @@ from aiogram import types
 
 from loader import  bot
 from keyboards.inline.choice_buttons import main, main_admin, cart_markup, delivery_keyboard, \
-    payment_keyboard, cart_all
+    payment_keyboard, generate_cart_all
 from loader import dp
 import os
 
@@ -13,6 +13,7 @@ from utils.db_functions import get_good_from_db, delete_cart, save_order, genera
     get_category_id_by_name, get_cart_items_count
 from utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_keyboard, update_good_card
 from utils.db_functions import get_cart, add_good_to_cart
+
 
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message):
@@ -98,8 +99,7 @@ async def send_good(callback: types.CallbackQuery, state: FSMContext):
     good_information = await get_good_from_db(good_id)
 
     if good_information is None:
-        await callback.answer(text="Извините, запрашиваемый товар в данный момент недоступен.",
-                               ) # chat_id=callback.message.from_user.id
+        await callback.answer(text="Извините, запрашиваемый товар в данный момент недоступен.",) # chat_id=callback.message.from_user.id
         return
 
     good_name, good_description, good_price, good_image = good_information
@@ -124,7 +124,7 @@ async def process_add_to_cart(callback_query: types.CallbackQuery, state: FSMCon
 
     await add_good_to_cart(user_id, good_id)
 
-    await bot.send_message(callback_query.from_user.id, text='🎉Товар добавлен в корзину.\nВы тут можете добавить еще один экземпляр товара или же убрать его', reply_markup=cart_all)
+    await bot.send_message(callback_query.from_user.id, text='🎉Товар добавлен в корзину.\nВы тут можете добавить еще один экземпляр товара или же убрать его', reply_markup=generate_cart_all(good_id))
 
 
 @dp.callback_query_handler(lambda c: c.data and c.data.startswith('plus'))
@@ -158,8 +158,8 @@ async def add_item_to_cart(callback_query: types.CallbackQuery, state: FSMContex
 
 
 @dp.callback_query_handler(lambda c: c.data and c.data.startswith('return_to_menu'))
-async def return_to_catalog(message: types.Message, state: FSMContext):
-    await send_catalog_start(message, state)
+async def return_to_catalog(callback: types.CallbackQuery, state: FSMContext):
+    await send_cart_good(callback, state)
 
 
 @dp.message_handler(text="Перейти в корзину")
@@ -192,17 +192,23 @@ async def show_cart(message: types.Message, state: FSMContext):
         await bot.send_message(message.chat.id, text=cart_text, reply_markup=cart_markup, parse_mode="HTML")
 
 
-@dp.message_handler(text="Очистить корзину")
-async def process_clear_cart(message: types.Message):
+@dp.message_handler(text="Очистить корзину", state=Get_Goods_Page.page)
+async def process_clear_cart(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
     await delete_cart(user_id)
-    await bot.send_message(message.chat.id, text='Корзина пуста!', reply_markup=main)
+    await bot.send_message(message.chat.id, text='Корзина пуста!')
+    await return_to_main_menu(message, state)
 
 
 @dp.message_handler(text='Заказать', state=Get_Goods_Page.page)
 async def order_start(message: types.Message, state: FSMContext):
     await message.answer('Введите свое ФИО:')
     await YourForm.name.set()
+
+
+@dp.message_handler(text='Выйти', state=Get_Goods_Page.page)
+async def quit_carts(message: types.Message, state: FSMContext):
+    await cmd_start(message)
 
 
 @dp.message_handler(state=YourForm.name)
@@ -246,12 +252,17 @@ async def process_payment(message: types.Message, state: FSMContext):
     await delete_cart(user_id)
     await message.answer("<b>Заказ успешно создан!</b>")
     await state.finish()
-
+    await return_to_main_menu(message, state)
 
 
 @dp.message_handler(text='Контакты', state=Get_Goods_Page.page)
 async def contacts(message: types.Message, state: FSMContext):
     await message.answer('Контакт для связи [Алексей](https://t.me/pal1maaaa)', parse_mode='Markdown')
+
+
+@dp.message_handler(text='Выйти в главное меню', state=Get_Goods_Page.page)
+async def return_to_main_menu(message: types.Message, state: FSMContext):
+    await cmd_start(message)
 
 
 @dp.message_handler()

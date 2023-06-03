@@ -12,6 +12,7 @@ async def create_table():
     price INT NOT NULL,
     photo VARCHAR(300) NOT NULL,
     category_id INT, 
+    availability INT,
     id INT GENERATED ALWAYS AS IDENTITY);""")
 
     con.commit()
@@ -21,7 +22,6 @@ async def create_table():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS carts (
            user_id INT NOT NULL,
            good_id INT NOT NULL,
-           parent_id INT NOT NULL,
            id INT GENERATED ALWAYS AS IDENTITY);""")
 
     con.commit()
@@ -70,14 +70,14 @@ async def update_goods_category_id():
     con.commit()
 
 
-async def add_good_to_db(name, description, price, photo, category_id):
+async def add_good_to_db(name, description, price, photo, category_id, availability):
     # Получаем id категории по ее названию
     cursor_obj.execute(f"""SELECT category_id FROM categories WHERE category_id='{category_id}'""")
 
     # Добавляем товар в таблицу goods, указывая id категории
-    cursor_obj.execute("INSERT INTO goods (name, description, price, photo, category_id) \
-                        VALUES (%s, %s, %s, %s, %s)",
-                       (name, description, price, photo, category_id))
+    cursor_obj.execute("INSERT INTO goods (name, description, price, photo, category_id, availability) \
+                        VALUES (%s, %s, %s, %s, %s, %s)",
+                       (name, description, price, photo, category_id, availability))
 
     con.commit()
 
