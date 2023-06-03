@@ -18,13 +18,13 @@ async def create_table():
     con.commit()
 
 
-async def create_table():
-    cursor_obj.execute("""CREATE TABLE IF NOT EXISTS carts (
-           user_id INT NOT NULL,
-           good_id INT NOT NULL,
-           id INT GENERATED ALWAYS AS IDENTITY);""")
+    async def create_table():
+        cursor_obj.execute("""CREATE TABLE IF NOT EXISTS carts (
+               user_id INT NOT NULL,
+               good_id INT NOT NULL,
+               id INT GENERATED ALWAYS AS IDENTITY);""")
 
-    con.commit()
+        con.commit()
 
 
 async def create_table():
@@ -186,8 +186,8 @@ async def get_goods_by_category_from_db(category_id):
 
 
 async def get_cart_items_count(user_id):
-    cursor_obj.execute("SELECT COUNT(*) FROM carts WHERE user_id = %s", (user_id,))
-    return cursor_obj.fetchall()
+    cursor_obj.execute("SELECT COUNT(*) FROM carts WHERE user_id = %s;", (user_id,))
+    return cursor_obj.fetchone()
 
 
 def generate_order_number():

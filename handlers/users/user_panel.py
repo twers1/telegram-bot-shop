@@ -127,8 +127,9 @@ async def process_add_to_cart(callback_query: types.CallbackQuery, state: FSMCon
     await bot.send_message(callback_query.from_user.id, text='🎉Товар добавлен в корзину.\nВы тут можете добавить еще один экземпляр товара или же убрать его', reply_markup=generate_cart_all(good_id))
 
 
-@dp.callback_query_handler(lambda c: c.data and c.data.startswith('plus'))
+@dp.callback_query_handler(lambda c: c.data and c.data.startswith('good:'))
 async def add_item_to_cart(callback_query: types.CallbackQuery, state: FSMContext):
+    print('Я в плюсике')
     good_id = int(callback_query.data.split(":")[1])
     print(callback_query.data)
     good_information = await get_good_from_db(good_id)

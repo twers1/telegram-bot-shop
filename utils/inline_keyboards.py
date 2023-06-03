@@ -126,7 +126,7 @@ async def update_good_card(message, good_name, good_description, good_price, goo
     cart_count = await get_cart_items_count(user_id)
 
     # обновляем карточку товара с новой клавиатурой и информацией
-    await bot.edit_message_media(media=types.InputMediaPhoto(good_image, caption=f"{good_name}\n{good_description}\n{good_price} руб."), chat_id=message.chat.id, message_id=message.message_id, reply_markup=inline_keyboard)
+    await bot.send_message(text=f'<b>Вы добавили еще один экземпляр товара: </b>\n{good_name} | {good_description}\nТаких товаров в корзине: {cart_count}', chat_id=message.chat.id)
 
 
 # async def add_good_to_cart(message: Message):
@@ -157,15 +157,4 @@ async def update_good_card(message, good_name, good_description, good_price, goo
 #     # Отправляем сообщение пользователю об успешном добавлении товара в корзину
 #     await message.answer(f"Товар {good_id} добавлен в корзину в количестве {quantity} шт.")
 
-
-# async def set_bank_card_number(callback_query: types.CallbackQuery):
-#     await BankCardState.waiting_for_bank_card.set()
-#     await callback_query.answer("Please enter your bank card number:")
-#
-#
-# async def process_bank_card_input(message: types.Message, state: FSMContext):
-#     bank_card_number = message.text
-#     await state.update_data(bank_card_number=bank_card_number)
-#     await message.answer(f"Your bank card number has been set to {bank_card_number}.")
-#     await state.reset_state()
 
