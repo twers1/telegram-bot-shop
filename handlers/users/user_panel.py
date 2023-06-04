@@ -102,7 +102,7 @@ async def send_good(callback: types.CallbackQuery, state: FSMContext):
         await callback.answer(text="Извините, запрашиваемый товар в данный момент недоступен.",) # chat_id=callback.message.from_user.id
         return
 
-    good_name, good_description, good_price, good_image = good_information
+    good_name, good_description, good_price, good_image, good_quantity = good_information
     price = [LabeledPrice(label=f"{good_name} | {good_description}", amount=good_price)]
 
     add_to_cart = InlineKeyboardMarkup().add(
@@ -122,44 +122,55 @@ async def process_add_to_cart(callback_query: types.CallbackQuery, state: FSMCon
     good_id = int(callback_query.data.split(':')[1])
     user_id = callback_query.from_user.id
 
-    await add_good_to_cart(user_id, good_id)
+    # Получаем информацию о товаре из базы данных
+    good_information = await get_good_from_db(good_id)
 
-    await bot.send_message(callback_query.from_user.id, text='🎉Товар добавлен в корзину.\nВы тут можете добавить еще один экземпляр товара или же убрать его', reply_markup=generate_cart_all(good_id))
+    if good_information is None:
+        await callback_query.answer(text="Извините, запрашиваемый товар в данный момент недоступен.")
+        return
+
+    good_name, good_description, good_price, good_image, good_quantity = good_information
+
+    # Добавляем товар в корзину с помощью функции add_good_to_cart
+    await add_good_to_cart(user_id, good_id, good_name, good_description, good_price, good_quantity)
+
+    await bot.send_message(callback_query.from_user.id, text=f'🎉Товар {good_name} добавлен в корзину.\nВы тут можете добавить еще один экземпляр товара или же убрать его', reply_markup=generate_cart_all(good_id))
+    print(good_name, good_description)
 
 
-@dp.callback_query_handler(lambda c: c.data and c.data.startswith('good:'))
+@dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:'), state=Get_Goods_Page.page)
 async def add_item_to_cart(callback_query: types.CallbackQuery, state: FSMContext):
     print('Я в плюсике')
     good_id = int(callback_query.data.split(":")[1])
     print(callback_query.data)
     good_information = await get_good_from_db(good_id)
-    good_name, good_description, good_price, good_image = good_information
+    good_name, good_description, good_price, good_image, good_quantity = good_information
 
     # Добавляем товар в корзину
-    await add_good_to_cart(callback_query.from_user.id, good_id)
+    await add_good_to_cart(callback_query.from_user.id, good_id, good_name, good_description, good_price, good_quantity)
 
     # Получаем количество товаров в корзине и обновляем карточку товара
     cart_items_count = await get_cart_items_count(callback_query.from_user.id)
     await update_good_card(callback_query.message, good_name, good_description, good_price, good_image,
                            cart_items_count)
-    # await bot.send_message(callback_query.from_user.id, text="Вы добавили еще один такой экземпляр товара!")
-
-# @dp.callback_query_handler(lambda callback_query: 'minus' in callback_query.data)
-# async def remove_item_from_cart(callback_query: types.CallbackQuery):
-#     # Получаем информацию о товаре из базы данных
-#     good_id = int(callback_query.data.split(":")[1])
-#     good_information = await get_good_from_db(good_id)
-#     good_name, good_description, good_price, good_image = good_information
-#
-#     # Удаляем товар из корзины
-#     await remove_good_from_cart(callback_query.from_user.id, good_id)
-#
-#     # Получаем количество товаров в корзине и обновляем карточку товара
-#     cart_items_count = await get_cart_items_count(callback_query.from_user.id)
-#     await update_good_card(callback_query.message, good_name, good_description, good_price, good_image, cart_items_count)
 
 
-@dp.callback_query_handler(lambda c: c.data and c.data.startswith('return_to_menu'))
+@dp.callback_query_handler(lambda callback_query: 'minus' in callback_query.data)
+async def remove_item_from_cart(callback_query: types.CallbackQuery):
+    # Получаем информацию о товаре из базы данных
+    good_id = int(callback_query.data.split(":")[1])
+    good_information = await get_good_from_db(good_id)
+    good_name, good_description, good_price, good_image = good_information
+
+    # Удаляем товар из корзины
+    await remove_good_from_cart(callback_query.from_user.id, good_id)
+
+    # Получаем количество товаров в корзине и обновляем карточку товара
+    cart_items_count = await get_cart_items_count(callback_query.from_user.id)
+    await update_good_card(callback_query.message, good_name, good_description, good_price, good_image, cart_items_count)
+
+
+@dp.callback_query_handler(lambda c: c.data and c.data.startswith('return_to_menu'), state=Get_Goods_Page.page)
 async def return_to_catalog(callback: types.CallbackQuery, state: FSMContext):
     await send_cart_good(callback, state)
 

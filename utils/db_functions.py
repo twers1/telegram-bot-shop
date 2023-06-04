@@ -99,7 +99,7 @@ async def get_all_goods():
 
 # Function for get products, where id=id(user)
 async def get_good_from_db(id):
-    cursor_obj.execute(f"""SELECT name, description, price, photo FROM goods WHERE id = {id};""")
+    cursor_obj.execute(f"""SELECT name, description, price, photo, availability FROM goods WHERE id = {id};""")
 
     return cursor_obj.fetchone()
 
@@ -112,8 +112,10 @@ async def remove_good_from_db(id):
 
 
 # Function for add product to cart(table)
-async def add_good_to_cart(user_id, good_id):
-    cursor_obj.execute(f"""INSERT INTO carts (user_id, good_id) VALUES ({user_id}, {good_id});""")
+async def add_good_to_cart(user_id, good_id, good_name, good_description, good_price, good_quantity):
+    cursor_obj.execute("INSERT INTO carts (user_id, good_id, good_name, good_description, good_price, good_quantity) \
+    VALUES (%s, %s, %s, %s, %s, %s);",
+                       (user_id, good_id, good_name, good_description, good_price, good_quantity))
 
     con.commit()
 
@@ -229,7 +231,7 @@ async def get_cart_items_count(user_id):
 # Function for get cart items
 async def get_cart_items(user_id):
     cursor_obj.execute("""
-        SELECT good_id
+        SELECT good_id, good_name, good_description, good_price, good_quantity
         FROM carts
         INNER JOIN goods ON carts.good_id = goods.id
         WHERE carts.user_id = %s;
