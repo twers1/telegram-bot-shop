@@ -10,7 +10,7 @@ import os
 
 from states import Get_Goods_Page, YourForm
 from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number, \
-    get_category_id_by_name, get_cart_items_count
+    get_category_id_by_name, get_cart_items_count, get_cart_items
 from utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_keyboard, update_good_card
 from utils.db_functions import get_cart, add_good_to_cart
 
@@ -250,12 +250,12 @@ async def process_payment(message: types.Message, state: FSMContext):
     payment_method = state_data['payment_method']
     user_id = message.from_user.id
 
-    # получаем список товаров из корзины пользователя и преобразуем его в список словарей
-    goods_in_cart = await get_cart(user_id)
-    goods_in_dict = [dict(zip(('id', 'name', 'description', 'price', 'quantity'), good)) for good in goods_in_cart]
-
-    # создаем словарь с информацией о количестве заказываемых товаров
-    goods_to_order = {good.get('id'): good.get('quantity') for good in goods_in_dict}
+    # Get cart items
+    cart_items = await get_cart_items(user_id)
+    goods_to_order = {}
+    for good in cart_items:
+        item_id, name, description, price, quantity = good
+        goods_to_order[item_id] = quantity
 
     await save_order(message.from_user.id, fio, phone_number, delivery_method, payment_method, order_number, goods_to_order)
     await delete_cart(user_id)
