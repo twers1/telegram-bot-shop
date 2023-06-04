@@ -5,6 +5,7 @@ import time
 import random
 
 
+# Table products
 async def create_table():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS goods (
     name VARCHAR(200) NOT NULL PRIMARY KEY,
@@ -18,15 +19,17 @@ async def create_table():
     con.commit()
 
 
-    async def create_table():
-        cursor_obj.execute("""CREATE TABLE IF NOT EXISTS carts (
-               user_id INT NOT NULL,
-               good_id INT NOT NULL,
-               id INT GENERATED ALWAYS AS IDENTITY);""")
+# Table carts
+async def create_table():
+    cursor_obj.execute("""CREATE TABLE IF NOT EXISTS carts (
+            user_id INT NOT NULL,
+            good_id INT NOT NULL,
+            id INT GENERATED ALWAYS AS IDENTITY);""")
 
-        con.commit()
+    con.commit()
 
 
+# Table bank_card
 async def create_table():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS bank_card (
            user_id INT NOT NULL,
@@ -36,6 +39,7 @@ async def create_table():
     con.commit()
 
 
+# Table orders
 async def create_table():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS orders (
            user_id INT NOT NULL,
@@ -49,6 +53,7 @@ async def create_table():
     con.commit()
 
 
+# Table categories
 async def create_table():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS categories (
            category_name VARCHAR(200) NOT NULL,
@@ -57,6 +62,7 @@ async def create_table():
     con.commit()
 
 
+# Function add category to db
 async def add_category_to_db(category_name):
     # Добавляем категорию в таблицу categories
     cursor_obj.execute("INSERT INTO categories (category_name) \
@@ -64,6 +70,7 @@ async def add_category_to_db(category_name):
     con.commit()
 
 
+# Function
 async def update_goods_category_id():
     # Обновляем столбец category_id в таблице goods на основе столбца category_name в таблице categories
     cursor_obj.execute("UPDATE goods SET category_id = categories.category_id FROM categories WHERE categories.category_name = goods.category_name")
@@ -132,11 +139,23 @@ async def get_bank_card(user_id):
     return cursor_obj.fetchone()
 
 
-async def save_order(user_id, fio, phone_number, delivery_method, payment_method, order_number):
+async def save_order(user_id, fio, phone_number, delivery_method, payment_method, order_number, goods_to_order):
     cursor_obj.execute("ALTER TABLE orders ALTER COLUMN phone_number TYPE bigint;")
     cursor_obj.execute("INSERT INTO orders (user_id, fio, phone_number, delivery_method, payment_method, order_number) \
                             VALUES (%s, %s, %s, %s, %s, %s)",
                        (user_id, fio, phone_number, delivery_method, payment_method, order_number))
+
+    for good_id, quantity in goods_to_order.items():
+        # получаем информацию о товаре из базы данных
+        cursor_obj.execute(f"SELECT availability FROM goods WHERE id='{good_id}'")
+        result = cursor_obj.fetchone()
+
+        if result and result[0] >= quantity:
+            # уменьшаем количество товаров на заданную величину и обновляем запись в базе данных
+            cursor_obj.execute(f"UPDATE goods SET availability=availability-{quantity} WHERE id={good_id}")
+        else:
+            # если количество товара меньше, чем запрашивается, генерируем ошибку
+            raise ValueError(f"Недостаточно товара '{good_id}' на складе")
 
     con.commit()
 
@@ -186,8 +205,19 @@ async def get_goods_by_category_from_db(category_id):
 
 
 async def get_cart_items_count(user_id):
-    cursor_obj.execute("SELECT COUNT(*) FROM carts WHERE user_id = %s;", (user_id,))
+    cursor_obj.execute("SELECT COUNT(*) FROM carts WHERE good_id = %s;", (user_id,))
     return cursor_obj.fetchone()
+
+
+async def get_cart_items(user_id):
+    cursor_obj.execute("""
+        SELECT good_id
+        FROM carts
+        INNER JOIN goods ON carts.good_id = goods.id
+        WHERE carts.user_id = %s;
+    """, (user_id,))
+
+    return cursor_obj.fetchall()
 
 
 def generate_order_number():

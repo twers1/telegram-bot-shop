@@ -2,6 +2,7 @@ from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, inline_keyboard
 from aiogram.utils.callback_data import CallbackData
 from aiogram.types import Message
+
 from loader import bot
 
 from loader import dp
@@ -126,7 +127,7 @@ async def update_good_card(message, good_name, good_description, good_price, goo
     cart_count = await get_cart_items_count(user_id)
 
     # обновляем карточку товара с новой клавиатурой и информацией
-    await bot.send_message(text=f'<b>Вы добавили еще один экземпляр товара: </b>\n{good_name} | {good_description}\nТаких товаров в корзине: {cart_count}', chat_id=message.chat.id)
+    await bot.send_message(chat_id=message.chat.id, text=f'<b>Вы добавили еще один экземпляр товара: </b>\n{good_name} | {good_description}') #\nТаких товаров в корзине: {cart_count}',
 
 
 # async def add_good_to_cart(message: Message):

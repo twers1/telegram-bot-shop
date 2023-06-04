@@ -142,6 +142,7 @@ async def add_item_to_cart(callback_query: types.CallbackQuery, state: FSMContex
     cart_items_count = await get_cart_items_count(callback_query.from_user.id)
     await update_good_card(callback_query.message, good_name, good_description, good_price, good_image,
                            cart_items_count)
+    # await bot.send_message(callback_query.from_user.id, text="Вы добавили еще один такой экземпляр товара!")
 
 # @dp.callback_query_handler(lambda callback_query: 'minus' in callback_query.data)
 # async def remove_item_from_cart(callback_query: types.CallbackQuery):
@@ -249,7 +250,14 @@ async def process_payment(message: types.Message, state: FSMContext):
     payment_method = state_data['payment_method']
     user_id = message.from_user.id
 
-    await save_order(message.from_user.id, fio, phone_number, delivery_method, payment_method, order_number)
+    # получаем список товаров из корзины пользователя и преобразуем его в список словарей
+    goods_in_cart = await get_cart(user_id)
+    goods_in_dict = [dict(zip(('id', 'name', 'description', 'price', 'quantity'), good)) for good in goods_in_cart]
+
+    # создаем словарь с информацией о количестве заказываемых товаров
+    goods_to_order = {good.get('id'): good.get('quantity') for good in goods_in_dict}
+
+    await save_order(message.from_user.id, fio, phone_number, delivery_method, payment_method, order_number, goods_to_order)
     await delete_cart(user_id)
     await message.answer("<b>Заказ успешно создан!</b>")
     await state.finish()
