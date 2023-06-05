@@ -23,6 +23,7 @@ admin_panel.add(KeyboardButton('Добавить товар'))
 admin_panel.add(KeyboardButton('Удалить товар'))
 admin_panel.add(KeyboardButton('Реквизиты банковской карты'))
 admin_panel.add(KeyboardButton('Размер предоплаты'))
+admin_panel.add(KeyboardButton('Заказы'))
 admin_panel.add(KeyboardButton(text="Выйти"))
 
 button = InlineKeyboardButton('Введите номер карты: ', callback_data='bank_card_number')

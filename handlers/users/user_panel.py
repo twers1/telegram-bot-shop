@@ -112,7 +112,8 @@ async def send_good(callback: types.CallbackQuery, state: FSMContext):
 
     await bot.send_photo(callback.message.chat.id, photo=good_image,caption=f"Имя товара - {good_name}\n"
                                                           f"Описание - {good_description}\n"
-                                                          f"Цена - {good_price}", reply_markup=add_to_cart)
+                                                          f"Цена - {good_price}\n"
+                                                                            f"Количество товара - {good_quantity}", reply_markup=add_to_cart)
 
     await callback.message.delete()
     await state.reset_state()
@@ -282,6 +283,12 @@ async def process_delivery(message: types.Message, state: FSMContext):
         data['delivery_method'] = message.text
     await message.answer('Выберите метод оплаты:', reply_markup=payment_keyboard)
     await YourForm.next()
+
+
+@dp.message_handler(lambda message: message.text == 'Полная оплата', state=YourForm.payment)
+async def process_full_payment(message: types.Message, state: FSMContext):
+    await message.answer("<b>Оплатите на карту: </b>")
+
 
 
 @dp.message_handler(state=YourForm.payment)

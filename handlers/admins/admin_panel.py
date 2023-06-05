@@ -9,7 +9,7 @@ from keyboards.inline.choice_buttons import admin_panel, keyboard
 from loader import dp, bot
 from states import NewItem, Get_Goods_Page, BankCardState, NewCategory
 from utils.db_functions import add_good_to_db, remove_good_from_db, save_bank_card, get_bank_card, set_category, \
-    generate_categories_keyboard
+    generate_categories_keyboard, get_all_orders
 from utils.inline_keyboards import get_all_goods_keyboard
 
 
@@ -199,6 +199,16 @@ async def prepayment_amount(message: types.Message, state:FSMContext):
         await message.answer(f"Номер вашей банковской карты: <b>{card_number[0]}</b>", reply_markup=admin_panel)
     else:
         await message.answer("Номер вашей банковской карты не найден.", reply_markup=admin_panel)
+
+
+@dp.message_handler(text="Заказы", state=Get_Goods_Page.page)
+async def get_user_order(message: types.Message, state: FSMContext):
+    orders = await get_all_orders()
+
+    orders_text = "Список заказов:\n\n"
+    for order in orders:
+        orders_text += f"ФИО: {order[0]}\nНомер телефона: {order[1]}\nСпособ доставки: {order[2]}\nСпособ оплаты: {order[3]}\nНомер заказа: {order[4]}\n\n"
+    await message.answer(orders_text)
 
 
 @dp.message_handler(text="Выйти", state=Get_Goods_Page.page)

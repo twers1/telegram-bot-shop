@@ -249,6 +249,11 @@ async def get_cart_items(user_id):
     return cursor_obj.fetchall()
 
 
+async def get_all_orders():
+    cursor_obj.execute("""SELECT fio, phone_number, delivery_method, payment_method, order_number FROM orders""")
+    return cursor_obj.fetchall()
+
+
 # Function for generate order number for column order_number(table orders)
 def generate_order_number():
     """Генерирует уникальный номер для заказа"""
