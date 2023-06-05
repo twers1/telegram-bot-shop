@@ -228,6 +228,12 @@ async def get_cart_items_count(good_id, user_id):
     return cursor_obj.fetchone()
 
 
+async def update_good_quantity(good_id: int, quantity: int) -> None:
+    """Обновляет количество товара на складе"""
+    cursor_obj.execute(f"UPDATE goods SET availability={quantity} WHERE id={good_id}")
+    con.commit()
+
+
 # Function for get cart items
 async def get_cart_items(user_id):
     cursor_obj.execute("""
