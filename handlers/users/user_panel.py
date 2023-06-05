@@ -135,7 +135,11 @@ async def process_add_to_cart(callback_query: types.CallbackQuery, state: FSMCon
     # Добавляем товар в корзину с помощью функции add_good_to_cart
     await add_good_to_cart(user_id, good_id, good_name, good_description, good_price, good_quantity)
 
-    await bot.send_message(callback_query.from_user.id, text=f'🎉Товар {good_name} добавлен в корзину.\nВы тут можете добавить еще один экземпляр товара или же убрать его', reply_markup=generate_cart_all(good_id))
+    await bot.send_message(
+        callback_query.from_user.id,
+        text=f'🎉Товар {good_name} добавлен в корзину.\nВы тут можете добавить еще один экземпляр товара или же убрать его',
+        reply_markup=generate_cart_all(good_id)
+    )
     print(good_name, good_description)
 
 
@@ -165,12 +169,28 @@ async def remove_item_from_cart(callback_query: types.CallbackQuery):
     good_name, good_description, good_price, good_image, good_quantity = good_information
 
     # Вычитаем 1 единицу товара из корзины
-    await subtract_good_from_cart(callback_query.from_user.id, good_id, good_name, good_description,callback_query.message)
+    await subtract_good_from_cart(
+        message=callback_query.message,
+        user_id=callback_query.from_user.id,
+        good_id=good_id,
+        good_name=good_name,
+        good_description=good_description
+    )
 
+    return
     # Получаем количество выбранного товара в корзине и обновляем карточку товара
     cart_items_count = await get_cart_items_count(good_id, callback_query.from_user.id)
-    await update_good_card(callback_query.message, good_name, good_description, good_price, good_image,
-                           cart_items_count)
+    await update_good_card(
+        message=callback_query.message,
+        good_name=good_name,
+        good_description=good_description,
+        good_price=good_price,
+        good_image=good_image,
+        user_id=callback_query.from_user.id,
+        good_id=good_id,
+    )
+
+                         
     # # Если количество выбранного товара в корзине равно 0, то удаляем товар из корзины полностью
     # if cart_items_count == 0:
     #     await remove_good_from_cart(callback_query.from_user.id, good_id)

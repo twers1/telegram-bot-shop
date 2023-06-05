@@ -222,8 +222,7 @@ async def get_goods_by_category_from_db(category_id):
 # Function for get carts items count in db
 async def get_cart_items_count(good_id, user_id):
     cursor_obj.execute("SELECT COUNT(*) FROM carts WHERE good_id = %s AND user_id = %s;", (good_id, user_id,))
-    return cursor_obj.fetchone()
-
+    return cursor_obj.fetchone()[0]
 
 async def update_good_quantity(good_id: int, quantity: int) -> None:
     """Обновляет количество товара на складе"""
