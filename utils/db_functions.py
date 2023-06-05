@@ -224,9 +224,16 @@ async def get_cart_items_count(good_id, user_id):
     cursor_obj.execute("SELECT COUNT(*) FROM carts WHERE good_id = %s AND user_id = %s;", (good_id, user_id,))
     return cursor_obj.fetchone()[0]
 
+
 async def update_good_quantity(good_id: int, quantity: int) -> None:
     """Обновляет количество товара на складе"""
     cursor_obj.execute(f"UPDATE goods SET availability={quantity} WHERE id={good_id}")
+    con.commit()
+
+
+async def save_cart(good_id, quantity):
+    print(good_id, quantity)
+    cursor_obj.execute(f"UPDATE carts SET good_quantity ={quantity}-1 WHERE good_id = {good_id}")
     con.commit()
 
 

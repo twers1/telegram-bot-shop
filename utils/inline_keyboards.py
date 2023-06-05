@@ -9,7 +9,7 @@ from loader import bot
 from loader import dp
 from states import BankCardState
 from utils.db_functions import get_all_goods, get_categories_from_db, get_goods_by_category_from_db, \
-    get_cart_items_count, get_cart
+    get_cart_items_count, get_cart, update_good_quantity, save_cart
 
 get_category_callback = CallbackData("get_category", "category_id")
 remove_category_callback = CallbackData("remove_category", "category_id")
@@ -131,7 +131,7 @@ async def update_good_card(message, good_name, good_description, good_price, goo
     await bot.send_message(chat_id=message.chat.id, text=f'<b>Вы добавили еще один экземпляр товара: </b>\n{good_name} | {good_description}', reply_markup=return_to_new_state) #\nТаких товаров в корзине: {cart_count}',
 
 
-async def subtract_good_from_cart(message, user_id: int, good_id: int, good_name, good_description):
+async def subtract_good_from_cart(message, user_id: int, good_id: int, good_name, good_description, good_quantity):
     # Получаем текущее количество выбранного товара в корзине пользователя
     cart_item_count = await get_cart_items_count(user_id, good_id)
 
@@ -140,7 +140,9 @@ async def subtract_good_from_cart(message, user_id: int, good_id: int, good_name
         await update_cart_item_count(user_id, good_id, cart_item_count - 1)
 
     await bot.send_message(chat_id=message.chat.id,
-                           text=f'<b>Вы убрали один экземпляр товара: </b>\n{good_name} | {good_description}')
+                           text=f'<b>Вы убрали один экземпляр товара: </b>\n{good_name} | {good_description}',
+                           reply_markup=return_to_new_state)
+    await save_cart(good_id, good_quantity)
 
 
 async def update_cart_item_count(user_id: int, good_id: int, count: int):
@@ -153,7 +155,7 @@ async def update_cart_item_count(user_id: int, good_id: int, count: int):
             item["count"] = count
             break
 
-    # TODO: Обновляем состояние корзины в базе данных
+
 
     # # Обновляем состояние корзины в базе данных
     # await save_cart(user_id, cart)

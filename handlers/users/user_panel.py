@@ -10,7 +10,7 @@ import os
 
 from states import Get_Goods_Page, YourForm
 from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number, \
-    get_category_id_by_name, get_cart_items_count, get_cart_items, update_good_quantity
+    get_category_id_by_name, get_cart_items_count, get_cart_items, update_good_quantity, save_cart
 from utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_keyboard, update_good_card, \
     subtract_good_from_cart
 from utils.db_functions import get_cart, add_good_to_cart
@@ -167,6 +167,7 @@ async def remove_item_from_cart(callback_query: types.CallbackQuery):
     good_id = int(callback_query.data.split(":")[2])
     good_information = await get_good_from_db(good_id)
     good_name, good_description, good_price, good_image, good_quantity = good_information
+    user_id = callback_query.from_user.id
 
     # Вычитаем 1 единицу товара из корзины
     await subtract_good_from_cart(
@@ -174,21 +175,25 @@ async def remove_item_from_cart(callback_query: types.CallbackQuery):
         user_id=callback_query.from_user.id,
         good_id=good_id,
         good_name=good_name,
-        good_description=good_description
-    )
-
-    return
-    # Получаем количество выбранного товара в корзине и обновляем карточку товара
-    cart_items_count = await get_cart_items_count(good_id, callback_query.from_user.id)
-    await update_good_card(
-        message=callback_query.message,
-        good_name=good_name,
         good_description=good_description,
-        good_price=good_price,
-        good_image=good_image,
-        user_id=callback_query.from_user.id,
-        good_id=good_id,
+        good_quantity=good_quantity
     )
+    # cart_items_count = await get_cart_items_count(callback_query.from_user.id, good_id)
+    await subtract_good_from_cart(callback_query.message, user_id, good_id, good_name, good_description, good_quantity)
+
+    # # Получаем количество выбранного товара в корзине и обновляем карточку товара
+    #
+    # cart_items_count = await get_cart_items_count(good_id, callback_query.from_user.id)
+    # await update_good_card(
+    #     message=callback_query.message,
+    #     good_name=good_name,
+    #     good_description=good_description,
+    #     good_price=good_price,
+    #     good_image=good_image,
+    #     user_id=callback_query.from_user.id,
+    #     good_id=good_id,
+    # )
+
 
                          
     # # Если количество выбранного товара в корзине равно 0, то удаляем товар из корзины полностью
