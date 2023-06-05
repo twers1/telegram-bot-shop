@@ -140,7 +140,7 @@ async def subtract_good_from_cart(message, user_id: int, good_id: int, good_name
         await update_cart_item_count(user_id, good_id, cart_item_count - 1)
 
     await bot.send_message(chat_id=message.chat.id,
-                           text=f'<b>Вы добавили еще один экземпляр товара: </b>\n{good_name} | {good_description}')
+                           text=f'<b>Вы убрали один экземпляр товара: </b>\n{good_name} | {good_description}')
 
 
 async def update_cart_item_count(user_id: int, good_id: int, count: int):
@@ -152,6 +152,8 @@ async def update_cart_item_count(user_id: int, good_id: int, count: int):
         if item["good_id"] == good_id:
             item["count"] = count
             break
+
+    # TODO: Обновляем состояние корзины в базе данных
 
     # # Обновляем состояние корзины в базе данных
     # await save_cart(user_id, cart)
