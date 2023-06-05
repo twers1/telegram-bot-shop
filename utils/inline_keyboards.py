@@ -122,9 +122,9 @@ async def get_all_goods_keyboard(mode, category_id):
     return all_goods_keyboards
 
 
-async def update_good_card(message, good_name, good_description, good_price, good_image, user_id):
+async def update_good_card(message, good_name, good_description, good_price, good_image, user_id, good_id):
     # получаем информацию о количестве товаров в корзине пользователя
-    cart_count = await get_cart_items_count(user_id)
+    cart_count = await get_cart_items_count(user_id, good_id)
 
     # обновляем карточку товара с новой клавиатурой и информацией
     await bot.send_message(chat_id=message.chat.id, text=f'<b>Вы добавили еще один экземпляр товара: </b>\n{good_name} | {good_description}') #\nТаких товаров в корзине: {cart_count}',

@@ -151,9 +151,9 @@ async def add_item_to_cart(callback_query: types.CallbackQuery, state: FSMContex
     await add_good_to_cart(callback_query.from_user.id, good_id, good_name, good_description, good_price, good_quantity)
 
     # Получаем количество товаров в корзине и обновляем карточку товара
-    cart_items_count = await get_cart_items_count(callback_query.from_user.id)
+    cart_items_count = await get_cart_items_count(callback_query.from_user.id, good_id)
     await update_good_card(callback_query.message, good_name, good_description, good_price, good_image,
-                           cart_items_count)
+                           cart_items_count, good_id)
 
 
 @dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:minus'), state=Get_Goods_Page.page)
@@ -273,12 +273,11 @@ async def process_payment(message: types.Message, state: FSMContext):
             goods_amount[good_id] = 0
         goods_amount[good_id] += 1
 
-    for good_id, quantity in goods_quantity:
+    for good_id, quantity in goods_quantity.items():
         amount = goods_amount[good_id]
-
         new_quantity = quantity - amount
 
-    await save_order(message.from_user.id, fio, phone_number, delivery_method, payment_method, order_number, goods_to_order)
+    await save_order(message.from_user.id, fio, phone_number, delivery_method, payment_method, order_number, goods_quantity)
     await delete_cart(user_id)
     await message.answer("<b>Заказ успешно создан!</b>")
     await state.finish()
