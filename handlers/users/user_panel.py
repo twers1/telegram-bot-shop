@@ -10,7 +10,7 @@ import os
 
 from states import Get_Goods_Page, YourForm
 from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number, \
-    get_category_id_by_name, get_cart_items_count, get_cart_items
+    get_category_id_by_name, get_cart_items_count, get_cart_items, update_good_quantity
 from utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_keyboard, update_good_card
 from utils.db_functions import get_cart, add_good_to_cart
 
@@ -277,6 +277,7 @@ async def process_payment(message: types.Message, state: FSMContext):
         amount = goods_amount[good_id]
 
         new_quantity = quantity - amount
+        await update_good_quantity(good_id, new_quantity)
 
     await save_order(message.from_user.id, fio, phone_number, delivery_method, payment_method, order_number, goods_to_order)
     await delete_cart(user_id)
