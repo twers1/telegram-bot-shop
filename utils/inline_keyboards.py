@@ -3,12 +3,13 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, inline_key
 from aiogram.utils.callback_data import CallbackData
 from aiogram.types import Message
 
+from keyboards.inline.choice_buttons import return_to_new_state
 from loader import bot
 
 from loader import dp
 from states import BankCardState
 from utils.db_functions import get_all_goods, get_categories_from_db, get_goods_by_category_from_db, \
-    get_cart_items_count
+    get_cart_items_count, get_cart
 
 get_category_callback = CallbackData("get_category", "category_id")
 remove_category_callback = CallbackData("remove_category", "category_id")
@@ -127,7 +128,33 @@ async def update_good_card(message, good_name, good_description, good_price, goo
     cart_count = await get_cart_items_count(user_id, good_id)
 
     # обновляем карточку товара с новой клавиатурой и информацией
-    await bot.send_message(chat_id=message.chat.id, text=f'<b>Вы добавили еще один экземпляр товара: </b>\n{good_name} | {good_description}') #\nТаких товаров в корзине: {cart_count}',
+    await bot.send_message(chat_id=message.chat.id, text=f'<b>Вы добавили еще один экземпляр товара: </b>\n{good_name} | {good_description}', reply_markup=return_to_new_state) #\nТаких товаров в корзине: {cart_count}',
+
+
+async def subtract_good_from_cart(message, user_id: int, good_id: int, good_name, good_description):
+    # Получаем текущее количество выбранного товара в корзине пользователя
+    cart_item_count = await get_cart_items_count(user_id, good_id)
+
+    # Если количество товара в корзине больше 0, то вычитаем 1 единицу из корзины
+    if cart_item_count > 0:
+        await update_cart_item_count(user_id, good_id, cart_item_count - 1)
+
+    await bot.send_message(chat_id=message.chat.id,
+                           text=f'<b>Вы добавили еще один экземпляр товара: </b>\n{good_name} | {good_description}')
+
+
+async def update_cart_item_count(user_id: int, good_id: int, count: int):
+    # Получаем текущее состояние корзины пользователя
+    cart = await get_cart(user_id)
+
+    # Ищем нужный товар в корзине и обновляем его количество
+    for item in cart:
+        if item["good_id"] == good_id:
+            item["count"] = count
+            break
+
+    # # Обновляем состояние корзины в базе данных
+    # await save_cart(user_id, cart)
 
 
 # async def add_good_to_cart(message: Message):

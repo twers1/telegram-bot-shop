@@ -11,7 +11,8 @@ import os
 from states import Get_Goods_Page, YourForm
 from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number, \
     get_category_id_by_name, get_cart_items_count, get_cart_items, update_good_quantity
-from utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_keyboard, update_good_card
+from utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_keyboard, update_good_card, \
+    subtract_good_from_cart
 from utils.db_functions import get_cart, add_good_to_cart
 
 
@@ -156,24 +157,33 @@ async def add_item_to_cart(callback_query: types.CallbackQuery, state: FSMContex
                            cart_items_count, good_id)
 
 
-@dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:minus'), state=Get_Goods_Page.page)
+@dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:minus:'), state="*")
 async def remove_item_from_cart(callback_query: types.CallbackQuery):
     # Получаем информацию о товаре из базы данных
-    good_id = int(callback_query.data.split(":")[1])
+    good_id = int(callback_query.data.split(":")[2])
     good_information = await get_good_from_db(good_id)
-    good_name, good_description, good_price, good_image = good_information
+    good_name, good_description, good_price, good_image, good_quantity = good_information
 
-    # Удаляем товар из корзины
-    await remove_good_from_cart(callback_query.from_user.id, good_id)
+    # Вычитаем 1 единицу товара из корзины
+    await subtract_good_from_cart(callback_query.from_user.id, good_id, good_name, good_description,callback_query.message)
 
-    # Получаем количество товаров в корзине и обновляем карточку товара
-    cart_items_count = await get_cart_items_count(callback_query.from_user.id)
-    await update_good_card(callback_query.message, good_name, good_description, good_price, good_image, cart_items_count)
+    # Получаем количество выбранного товара в корзине и обновляем карточку товара
+    cart_items_count = await get_cart_items_count(good_id, callback_query.from_user.id)
+    await update_good_card(callback_query.message, good_name, good_description, good_price, good_image,
+                           cart_items_count)
+    # # Если количество выбранного товара в корзине равно 0, то удаляем товар из корзины полностью
+    # if cart_items_count == 0:
+    #     await remove_good_from_cart(callback_query.from_user.id, good_id)
 
 
-@dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:return_to_menu'), state=Get_Goods_Page.page)
-async def return_to_catalog(callback: types.CallbackQuery, state: FSMContext):
-    await send_cart_good(callback, state)
+# @dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:return_to_menu'), state="*")
+# async def return_to_catalog(callback: types.CallbackQuery, state: FSMContext):
+#     await send_cart_good(callback, state)
+
+
+@dp.message_handler(text="Выйти в главное меню")
+async def return_to_menu_new_state(message: types.Message):
+    await cmd_start(message)
 
 
 @dp.message_handler(text="Перейти в корзину")
