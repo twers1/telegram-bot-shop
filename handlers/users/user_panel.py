@@ -138,10 +138,11 @@ async def process_add_to_cart(callback_query: types.CallbackQuery, state: FSMCon
     print(good_name, good_description)
 
 
-@dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:'), state=Get_Goods_Page.page)
+@dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:plus:'), state="*")
 async def add_item_to_cart(callback_query: types.CallbackQuery, state: FSMContext):
     print('Я в плюсике')
-    good_id = int(callback_query.data.split(":")[1])
+    print(await state.get_state())
+    good_id = int(callback_query.data.split(":")[2])
     print(callback_query.data)
     good_information = await get_good_from_db(good_id)
     good_name, good_description, good_price, good_image, good_quantity = good_information
@@ -155,7 +156,7 @@ async def add_item_to_cart(callback_query: types.CallbackQuery, state: FSMContex
                            cart_items_count)
 
 
-@dp.callback_query_handler(lambda callback_query: 'minus' in callback_query.data)
+@dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:minus'), state=Get_Goods_Page.page)
 async def remove_item_from_cart(callback_query: types.CallbackQuery):
     # Получаем информацию о товаре из базы данных
     good_id = int(callback_query.data.split(":")[1])
@@ -170,7 +171,7 @@ async def remove_item_from_cart(callback_query: types.CallbackQuery):
     await update_good_card(callback_query.message, good_name, good_description, good_price, good_image, cart_items_count)
 
 
-@dp.callback_query_handler(lambda c: c.data and c.data.startswith('return_to_menu'), state=Get_Goods_Page.page)
+@dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:return_to_menu'), state=Get_Goods_Page.page)
 async def return_to_catalog(callback: types.CallbackQuery, state: FSMContext):
     await send_cart_good(callback, state)
 
@@ -263,10 +264,19 @@ async def process_payment(message: types.Message, state: FSMContext):
 
     # Get cart items
     cart_items = await get_cart_items(user_id)
-    goods_to_order = {}
+    goods_amount = {}
+    goods_quantity = {}
     for good in cart_items:
-        item_id, name, description, price, quantity = good
-        goods_to_order[item_id] = quantity
+        good_id = good[0]
+        goods_quantity[good_id] = good[4]
+        if good_id not in goods_amount.keys():
+            goods_amount[good_id] = 0
+        goods_amount[good_id] += 1
+
+    for good_id, quantity in goods_quantity:
+        amount = goods_amount[good_id]
+
+        new_quantity = quantity - amount
 
     await save_order(message.from_user.id, fio, phone_number, delivery_method, payment_method, order_number, goods_to_order)
     await delete_cart(user_id)

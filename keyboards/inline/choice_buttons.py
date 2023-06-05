@@ -45,11 +45,11 @@ cart_markup.add(KeyboardButton('Выйти'))
 
 def generate_cart_all(good_id: int) -> InlineKeyboardMarkup:
     cart_all = InlineKeyboardMarkup().add(
-        InlineKeyboardButton(text='➕', callback_data=f'good:{good_id}:plus')
+        InlineKeyboardButton(text='➕', callback_data=f'good:plus:{good_id}')
     ).add(
-        InlineKeyboardButton(text='➖', callback_data=f'good:{good_id}:minus')
+        InlineKeyboardButton(text='➖', callback_data=f'good:minus:{good_id}')
     ).add(
-        InlineKeyboardButton(text='Перейти в корзину', callback_data=f'good:{good_id}:return_to_menu')
+        InlineKeyboardButton(text='Перейти в корзину', callback_data=f'good:return_to_menu:{good_id}')
     )
 
     return cart_all
