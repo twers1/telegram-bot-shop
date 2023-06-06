@@ -201,16 +201,6 @@ async def prepayment_amount(message: types.Message, state:FSMContext):
         await message.answer("Номер вашей банковской карты не найден.", reply_markup=admin_panel)
 
 
-@dp.message_handler(text="Заказы", state=Get_Goods_Page.page)
-async def get_user_order(message: types.Message, state: FSMContext):
-    orders = await get_all_orders()
-
-    orders_text = "Список заказов:\n\n"
-    for order in orders:
-        orders_text += f"ФИО: {order[0]}\nНомер телефона: {order[1]}\nСпособ доставки: {order[2]}\nСпособ оплаты: {order[3]}\nНомер заказа: {order[4]}\n\n"
-    await message.answer(orders_text)
-
-
 @dp.message_handler(text="Выйти", state=Get_Goods_Page.page)
 async def return_to_lobby(message: types.Message, state: FSMContext):
     await cmd_start(message)

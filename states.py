@@ -29,6 +29,7 @@ class YourForm(StatesGroup):
     phone = State()
     delivery = State()
     payment = State()
+    address = State()
 
 
 class NewCategory(StatesGroup):

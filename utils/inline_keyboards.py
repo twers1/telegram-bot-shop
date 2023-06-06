@@ -155,6 +155,10 @@ async def update_cart_item_count(user_id: int, good_id: int, count: int):
             item["count"] = count
             break
 
+async def get_username(id):
+    chat_member = await bot.get_chat_member(chat_id=id, user_id=id)
+    return chat_member.user.username
+
 
 
     # # Обновляем состояние корзины в базе данных

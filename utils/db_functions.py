@@ -151,11 +151,11 @@ async def get_bank_card(user_id):
 
 
 # Function for save order(add to db)
-async def save_order(user_id, fio, phone_number, delivery_method, payment_method, order_number, goods_to_order):
+async def save_order(user_id, fio, username, phone_number, day, orders, delivery_method, address, payment_method, order_number, goods_to_order):
     cursor_obj.execute("ALTER TABLE orders ALTER COLUMN phone_number TYPE TEXT;")
-    cursor_obj.execute("INSERT INTO orders (user_id, fio, phone_number, delivery_method, payment_method, order_number) \
-                            VALUES (%s, %s, %s, %s, %s, %s)",
-                       (user_id, fio, phone_number, delivery_method, payment_method, order_number))
+    cursor_obj.execute("INSERT INTO orders (user_id, fio, username, phone_number, day, orders, delivery_method, address, payment_method, order_number) \
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                       (user_id, fio, username, phone_number, day, orders, delivery_method, address, payment_method, order_number))
 
     for good_id, quantity in goods_to_order.items():
         # получаем информацию о товаре из базы данных

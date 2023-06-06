@@ -109,3 +109,37 @@
 
 # catalog_list_callback_data = InlineKeyboardMarkup(row_width=2)
 # catalog_list_callback_data.add()
+
+ # # Получаем количество выбранного товара в корзине и обновляем карточку товара
+    #
+    # cart_items_count = await get_cart_items_count(good_id, callback_query.from_user.id)
+    # await update_good_card(
+    #     message=callback_query.message,
+    #     good_name=good_name,
+    #     good_description=good_description,
+    #     good_price=good_price,
+    #     good_image=good_image,
+    #     user_id=callback_query.from_user.id,
+    #     good_id=good_id,
+    # )
+
+
+
+    # # Если количество выбранного товара в корзине равно 0, то удаляем товар из корзины полностью
+    # if cart_items_count == 0:
+    #     await remove_good_from_cart(callback_query.from_user.id, good_id)
+
+
+# @dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:return_to_menu'), state="*")
+# async def return_to_catalog(callback: types.CallbackQuery, state: FSMContext):
+#     await send_cart_good(callback, state)
+
+
+ # @dp.message_handler(text="Заказы", state=Get_Goods_Page.page)
+# async def get_user_order(message: types.Message, state: FSMContext):
+#     orders = await get_all_orders()
+#
+#     orders_text = "Список заказов:\n\n"
+#     for order in orders:
+#         orders_text += f"ФИО: {order[0]}\nНомер телефона: {order[1]}\nСпособ доставки: {order[2]}\nСпособ оплаты: {order[3]}\nНомер заказа: {order[4]}\n\n"
+#     await message.answer(orders_text)

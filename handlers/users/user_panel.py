@@ -7,12 +7,13 @@ from keyboards.inline.choice_buttons import main, main_admin, cart_markup, deliv
     payment_keyboard, generate_cart_all
 from loader import dp
 import os
+import datetime
 
 from states import Get_Goods_Page, YourForm
 from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number, \
     get_category_id_by_name, get_cart_items_count, get_cart_items, update_good_quantity, save_cart
 from utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_keyboard, update_good_card, \
-    subtract_good_from_cart
+    subtract_good_from_cart, get_username
 from utils.db_functions import get_cart, add_good_to_cart
 
 
@@ -132,16 +133,20 @@ async def process_add_to_cart(callback_query: types.CallbackQuery, state: FSMCon
         return
 
     good_name, good_description, good_price, good_image, good_quantity = good_information
+    print(good_quantity)
+    if good_quantity == 0:
+        await callback_query.answer(text="Извините, данный товар закончился.")
+        return send_good
+    else:
+        # Добавляем товар в корзину с помощью функции add_good_to_cart
+        await add_good_to_cart(user_id, good_id, good_name, good_description, good_price, good_quantity)
 
-    # Добавляем товар в корзину с помощью функции add_good_to_cart
-    await add_good_to_cart(user_id, good_id, good_name, good_description, good_price, good_quantity)
-
-    await bot.send_message(
-        callback_query.from_user.id,
-        text=f'🎉Товар {good_name} добавлен в корзину.\nВы тут можете добавить еще один экземпляр товара или же убрать его',
-        reply_markup=generate_cart_all(good_id)
-    )
-    print(good_name, good_description)
+        await bot.send_message(
+            callback_query.from_user.id,
+            text=f'🎉Товар {good_name} добавлен в корзину.\nВы тут можете добавить еще один экземпляр товара или же убрать его',
+            reply_markup=generate_cart_all(good_id)
+        )
+        print(good_name, good_description)
 
 
 @dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:plus:'), state="*")
@@ -179,32 +184,7 @@ async def remove_item_from_cart(callback_query: types.CallbackQuery):
         good_description=good_description,
         good_quantity=good_quantity
     )
-    # cart_items_count = await get_cart_items_count(callback_query.from_user.id, good_id)
     await subtract_good_from_cart(callback_query.message, user_id, good_id, good_name, good_description, good_quantity)
-
-    # # Получаем количество выбранного товара в корзине и обновляем карточку товара
-    #
-    # cart_items_count = await get_cart_items_count(good_id, callback_query.from_user.id)
-    # await update_good_card(
-    #     message=callback_query.message,
-    #     good_name=good_name,
-    #     good_description=good_description,
-    #     good_price=good_price,
-    #     good_image=good_image,
-    #     user_id=callback_query.from_user.id,
-    #     good_id=good_id,
-    # )
-
-
-                         
-    # # Если количество выбранного товара в корзине равно 0, то удаляем товар из корзины полностью
-    # if cart_items_count == 0:
-    #     await remove_good_from_cart(callback_query.from_user.id, good_id)
-
-
-# @dp.callback_query_handler(lambda c: c.data and c.data.startswith(f'good:return_to_menu'), state="*")
-# async def return_to_catalog(callback: types.CallbackQuery, state: FSMContext):
-#     await send_cart_good(callback, state)
 
 
 @dp.message_handler(text="Выйти в главное меню")
@@ -285,16 +265,23 @@ async def process_delivery(message: types.Message, state: FSMContext):
     await YourForm.next()
 
 
-@dp.message_handler(lambda message: message.text == 'Полная оплата', state=YourForm.payment)
-async def process_full_payment(message: types.Message, state: FSMContext):
-    await message.answer("<b>Оплатите на карту: </b>")
-
+# @dp.message_handler(lambda message: message.text == 'Полная оплата', state=YourForm.payment)
+# async def process_full_payment(message: types.Message, state: FSMContext):
+#     await message.answer("<b>Оплатите на карту: </b>")
 
 
 @dp.message_handler(state=YourForm.payment)
 async def process_payment(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['payment_method'] = message.text
+    await message.answer('Введите адрес доставки: ')
+    await YourForm.next()
+
+
+@dp.message_handler(state=YourForm.address)
+async def get_address(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['address'] = message.text
 
     state_data = await state.get_data()
     order_number = generate_order_number()
@@ -302,7 +289,10 @@ async def process_payment(message: types.Message, state: FSMContext):
     phone_number = state_data['phone_number']
     delivery_method = state_data['delivery_method']
     payment_method = state_data['payment_method']
+    address = state_data['address']
     user_id = message.from_user.id
+    username = await get_username(user_id)
+    day = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     # Get cart items
     cart_items = await get_cart_items(user_id)
@@ -320,9 +310,28 @@ async def process_payment(message: types.Message, state: FSMContext):
         new_quantity = quantity - amount
         await update_good_quantity(good_id, new_quantity)
 
-    await save_order(message.from_user.id, fio, phone_number, delivery_method, payment_method, order_number, goods_quantity)
+    orders = ''
+    for good in cart_items:
+        good_id = good[0]
+        goods_quantity[good_id] = 4
+        if good_id not in goods_amount.keys():
+            goods_amount[good_id] = 0
+        goods_amount[good_id] += 1
+        orders += f'{good[2]} ({good[4]}шт.), '
+
+    await save_order(message.from_user.id, fio, username, phone_number, day, orders, delivery_method, address, payment_method, order_number, goods_quantity)
     await delete_cart(user_id)
     await message.answer("<b>Заказ успешно создан!</b>")
+    admin_id = os.getenv('ADMIN_ID')
+    order_info = f"Заказ №{order_number}\n\n"
+    order_info += f"Дата: {day}\n"
+    order_info += f"Контактное лицо: {fio} - {username}\n"
+    order_info += f"Телефон: {phone_number}\n"
+    order_info += f"Адрес: {address}\n"
+    order_info += f"Способ доставки: {delivery_method}\n"
+    order_info += f"Способ оплаты: {payment_method}\n"
+    order_info += f"Товары:\n{orders}"
+    await bot.send_message(chat_id=admin_id, text=order_info)
     await state.finish()
     await return_to_main_menu(message, state)
 
