@@ -6,7 +6,7 @@ import random
 
 
 # Table products
-async def create_table():
+async def create_table_products():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS goods (
     name VARCHAR(200) NOT NULL PRIMARY KEY,
     description VARCHAR(200) NOT NULL,
@@ -20,7 +20,7 @@ async def create_table():
 
 
 # Table carts
-async def create_table():
+async def create_table_carts():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS carts (
             user_id INT NOT NULL,
             good_id INT NOT NULL,
@@ -30,7 +30,7 @@ async def create_table():
 
 
 # Table bank_card
-async def create_table():
+async def create_table_bank_card():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS bank_card (
            user_id INT NOT NULL,
            card_number VARCHAR(16) NOT NULL,
@@ -40,7 +40,7 @@ async def create_table():
 
 
 # Table orders
-async def create_table():
+async def create_table_orders():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS orders (
            user_id INT NOT NULL,
            fio VARCHAR(200) NOT NULL,
@@ -54,7 +54,7 @@ async def create_table():
 
 
 # Table categories
-async def create_table():
+async def create_table_categories():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS categories (
            category_name VARCHAR(200) NOT NULL,
            category_id INT GENERATED ALWAYS AS IDENTITY);""")
