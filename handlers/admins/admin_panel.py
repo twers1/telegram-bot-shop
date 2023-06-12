@@ -1,3 +1,4 @@
+import json
 import os
 import re
 
@@ -12,11 +13,13 @@ from utils.db_functions import add_good_to_db, remove_good_from_db, save_bank_ca
     generate_categories_keyboard, get_all_orders
 from utils.inline_keyboards import get_all_goods_keyboard
 
+ADMIN_ID = json.loads(os.getenv('ADMIN_ID'))
+
 
 @dp.message_handler(text="Админ-панель", state=Get_Goods_Page.page)
 async def contacts(message: types.Message, state: FSMContext):
     print("Бот запущен(админ-панель)")
-    if message.from_user.id == int(os.getenv('ADMIN_ID')):
+    if message.from_user.id in ADMIN_ID:
         bot_message = await bot.send_message(message.from_user.id, f'Вы вошли в админ-панель', reply_markup=admin_panel)
         async with state.proxy() as data:
             data["key"] = bot_message.message_id

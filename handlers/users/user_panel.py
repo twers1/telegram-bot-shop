@@ -8,6 +8,7 @@ from keyboards.inline.choice_buttons import main, main_admin, cart_markup, deliv
 from loader import dp
 import os
 import datetime
+import json
 
 from states import Get_Goods_Page, YourForm
 from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number, \
@@ -17,11 +18,14 @@ from utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_ke
 from utils.db_functions import get_cart, add_good_to_cart
 
 
+ADMIN_ID = json.loads(os.getenv('ADMIN_ID'))
+
+
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message):
     await message.answer(f'Добро пожаловать в магазин!', reply_markup=main)
 
-    if message.from_user.id == int(os.getenv('ADMIN_ID')):
+    if message.from_user.id in ADMIN_ID:
         await message.answer(f'Вы авторизовались как администратор', reply_markup=main_admin)
 
     await Get_Goods_Page.first()

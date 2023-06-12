@@ -219,6 +219,11 @@ async def get_goods_by_category_from_db(category_id):
     return cursor_obj.fetchall()
 
 
+async def get_goods_my_db():
+    cursor_obj.execute("SELECT name, description, id FROM goods")
+    return cursor_obj.fetchall()
+
+
 # Function for get carts items count in db
 async def get_cart_items_count(good_id, user_id):
     cursor_obj.execute("SELECT COUNT(*) FROM carts WHERE good_id = %s AND user_id = %s;", (good_id, user_id,))

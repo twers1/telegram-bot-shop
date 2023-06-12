@@ -9,7 +9,7 @@ from loader import bot
 from loader import dp
 from states import BankCardState
 from utils.db_functions import get_all_goods, get_categories_from_db, get_goods_by_category_from_db, \
-    get_cart_items_count, get_cart, update_good_quantity, save_cart
+    get_cart_items_count, get_cart, update_good_quantity, save_cart, get_goods_my_db
 
 get_category_callback = CallbackData("get_category", "category_id")
 remove_category_callback = CallbackData("remove_category", "category_id")
@@ -70,10 +70,10 @@ async def get_all_categories_keyboard(mode):
     return all_categories_keyboards
 
 
-async def get_all_goods_keyboard(mode, category_id):
+async def get_all_goods_keyboard(mode):
     all_goods_keyboards = {}
     all_buttons = []
-    goods = await get_goods_by_category_from_db(category_id)
+    goods = await get_goods_my_db()
     callback = None
     page = 1
 
