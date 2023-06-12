@@ -24,6 +24,10 @@ async def create_table_carts():
     cursor_obj.execute("""CREATE TABLE IF NOT EXISTS carts (
             user_id INT NOT NULL,
             good_id INT NOT NULL,
+            good_name TEXT,
+            good_description TEXT,
+            good_price INT NOT NULL,
+            good_quantity INT NOT NULL,
             id INT GENERATED ALWAYS AS IDENTITY);""")
 
     con.commit()
@@ -48,6 +52,10 @@ async def create_table_orders():
            delivery_method TEXT NOT NULL,
            payment_method TEXT NOT NULL, 
            order_number INT NOT NULL,
+           address TEXT,
+           username TEXT,
+           day timestamp,
+           orders TEXT,
            id INT GENERATED ALWAYS AS IDENTITY);""")
 
     con.commit()
