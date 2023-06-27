@@ -70,10 +70,10 @@ async def get_all_categories_keyboard(mode):
     return all_categories_keyboards
 
 
-async def get_all_goods_keyboard(mode):
+async def get_all_goods_keyboard(mode, category_id):
     all_goods_keyboards = {}
     all_buttons = []
-    goods = await get_goods_my_db()
+    goods = await get_goods_by_category_from_db(category_id)
     callback = None
     page = 1
 
