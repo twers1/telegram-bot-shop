@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, inline_keyboard
-from utils.connect_db import con, cursor_obj
+from src.utils.connect_db import con, cursor_obj
 
 import time
 import random

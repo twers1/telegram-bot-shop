@@ -2,20 +2,20 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import (LabeledPrice, InlineKeyboardMarkup, InlineKeyboardButton)
 from aiogram import types
 
-from loader import  bot
-from keyboards.inline.choice_buttons import main, main_admin, cart_markup, delivery_keyboard, \
+from src.loader import  bot
+from src.keyboards.inline.choice_buttons import main, main_admin, cart_markup, delivery_keyboard, \
     payment_keyboard, generate_cart_all
-from loader import dp
+from src.loader import dp
 import os
 import datetime
 import json
 
-from states import Get_Goods_Page, YourForm
-from utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number, \
+from src.states import Get_Goods_Page, YourForm
+from src.utils.db_functions import get_good_from_db, delete_cart, save_order, generate_order_number, \
     get_category_id_by_name, get_cart_items_count, get_cart_items, update_good_quantity, save_cart
-from utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_keyboard, update_good_card, \
+from src.utils.inline_keyboards import get_all_goods_keyboard, get_all_categories_keyboard, update_good_card, \
     subtract_good_from_cart, get_username
-from utils.db_functions import get_cart, add_good_to_cart
+from src.utils.db_functions import get_cart, add_good_to_cart
 
 
 ADMIN_ID = json.loads(os.getenv('ADMIN_ID'))

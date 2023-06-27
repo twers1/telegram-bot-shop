@@ -3,12 +3,12 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, inline_key
 from aiogram.utils.callback_data import CallbackData
 from aiogram.types import Message
 
-from keyboards.inline.choice_buttons import return_to_new_state
-from loader import bot
+from src.keyboards.inline.choice_buttons import return_to_new_state
+from src.loader import bot
 
-from loader import dp
-from states import BankCardState
-from utils.db_functions import get_all_goods, get_categories_from_db, get_goods_by_category_from_db, \
+from src.loader import dp
+from src.states import BankCardState
+from src.utils.db_functions import get_all_goods, get_categories_from_db, get_goods_by_category_from_db, \
     get_cart_items_count, get_cart, update_good_quantity, save_cart, get_goods_my_db
 
 get_category_callback = CallbackData("get_category", "category_id")

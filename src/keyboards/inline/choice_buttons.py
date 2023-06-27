@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 
-from keyboards.inline.callback_datas import buy_callback
+from src.keyboards.inline.callback_datas import buy_callback
 from aiogram.utils.callback_data import CallbackData
 
 import os

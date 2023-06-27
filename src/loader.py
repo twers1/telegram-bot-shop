@@ -1,11 +1,12 @@
 import psycopg2
+import os
+import src.config
 
 from aiogram import Bot,Dispatcher, types
-import os
 
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-import config
+from src import config
 
 bot = Bot(config.TOKEN, parse_mode=types.ParseMode.HTML)
 storage = MemoryStorage()

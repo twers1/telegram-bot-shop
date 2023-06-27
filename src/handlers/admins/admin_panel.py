@@ -5,13 +5,13 @@ import re
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from handlers.users.user_panel import cmd_start
-from keyboards.inline.choice_buttons import admin_panel, keyboard
-from loader import dp, bot
-from states import NewItem, Get_Goods_Page, BankCardState, NewCategory
-from utils.db_functions import add_good_to_db, remove_good_from_db, save_bank_card, get_bank_card, set_category, \
+from src.handlers.users.user_panel import cmd_start
+from src.keyboards.inline.choice_buttons import admin_panel, keyboard
+from src.loader import dp, bot
+from src.states import NewItem, Get_Goods_Page, BankCardState, NewCategory
+from src.utils.db_functions import add_good_to_db, remove_good_from_db, save_bank_card, get_bank_card, set_category, \
     generate_categories_keyboard, get_all_orders
-from utils.inline_keyboards import get_all_goods_keyboard
+from src.utils.inline_keyboards import get_all_goods_keyboard
 
 ADMIN_ID = json.loads(os.getenv('ADMIN_ID'))
 
