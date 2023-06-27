@@ -1,0 +1,21 @@
+version: '3.9'
+
+services:
+  postgres:
+      container_name: telegram-bot-shop-db
+      image: 'postgres:15.3-alpine'
+      ports:
+        - '5432:5432'
+      restart: unless-stopped
+      environment:
+        POSTGRES_USER: twers1
+        POSTGRES_PASSWORD: postgres
+  bot:
+        container_name: bot
+        build:
+          context: .
+          dockerfile: Dockerfile
+        stop_signal: SIGINT
+        restart: unless-stopped
+        depends_on:
+            - postgres
