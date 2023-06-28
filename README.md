@@ -4,7 +4,7 @@
 
 This telegram bot is needed in order to create your own store in the bot itself and start your business in the most popular messenger 
 
-* Use python language, aiogram library, DB postgresql
+* Use python language, aiogram library, DB postgresql, docker
 
 ## Functions: 
 
@@ -13,14 +13,6 @@ user_panel
     Catalog 
     Cart
     Contacts
-
-The catalog contains a multi-level catalog that shows first the categories, then the products in that category, and then the product card. The product card has "Add to cart" and "Go to menu" buttons. Clicking on the button "Add to cart" adds to the cart itself, and shows new 2 buttons "+" and "-", clicking on the button "+" adds this same item by one unit, and when you click "-" does the same thing only removes one item from the database 
-
-The cart contains the user's products, and also has "Checkout" and "Clear Cart" buttons, when you click on "Checkout" - the user must enter his data (phone number, delivery address, delivery method, method of payment, and so on). If you click "Clear cart" - the cart itself is cleared completely
-
-The "Contacts" button stores information about the administrator himself 
-
-
 
 admin_panel 
 
@@ -32,7 +24,26 @@ admin_panel
 
 ## Demo 
 
+<img src="images/img.png" width="250px">
+<img src="images/img_1.png" width="250px">
+<img src="images/img_2.png" width="250px">
+<img src="images/img_3.png" width="250px">
+<img src="images/img_4.png" width="250px">
+<img src="images/img_5.png" width="250px">
+<img src="images/img_6.png" width="250px">
+<img src="images/img_7.png" width="250px">
+<img src="images/img_8.png" width="250px">
+<img src="images/img_9.png" width="250px">
+<img src="images/img_10.png" width="250px">
+<img src="images/img_11.png" width="250px">
+<img src="images/img_12.png" width="250px">
+<img src="images/img_13.png" width="250px">
+
 ## Docker 
+
+```commandline
+docker-compose up
+```
 
 ##### ru 
 
@@ -42,6 +53,7 @@ admin_panel
 * язык программирования Python
 * библиотека aiogram
 * база данных Postgresql
+* Docker
 
 
 ## Функции бота
@@ -52,11 +64,6 @@ admin_panel
     Корзина 
     Контакты 
 
-Каталог содержит в себе многоуровневый каталог, который показывает сначала категории товара, потом товары, которые есть в категории, а потом уже саму карточку товара. В карточке товара можно "Добавить в корзину" и "Перейти в меню". При нажатии кнопки "Добавить в корзину" - добавляется в корзину, а также отправляются еще 2 кнопки "+" и "-", нажимая на кнопку "+" добавляется одна единица товара, а при нажатии "-" убавляется одна единица товара 
-
-Корзина содержит в себе товары, которые пользователь добавил в саму корзину
-
-Контакты содержат в себе контакт администратора магазина
 
 Для админов доступно: 
 
@@ -69,6 +76,25 @@ admin_panel
 
 ## Демонстрация
 
+<img src="images/img.png" width="250px">
+<img src="images/img_1.png" width="250px">
+<img src="images/img_2.png" width="250px">
+<img src="images/img_3.png" width="250px">
+<img src="images/img_4.png" width="250px">
+<img src="images/img_5.png" width="250px">
+<img src="images/img_6.png" width="250px">
+<img src="images/img_7.png" width="250px">
+<img src="images/img_8.png" width="250px">
+<img src="images/img_9.png" width="250px">
+<img src="images/img_10.png" width="250px">
+<img src="images/img_11.png" width="250px">
+<img src="images/img_12.png" width="250px">
+<img src="images/img_13.png" width="250px">
+
 ## Docker
+
+```commandline
+docker-compose up
+```
 
     
