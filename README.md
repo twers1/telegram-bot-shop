@@ -1,7 +1,10 @@
 <div align="center">
 <img alt="Static Badge" src="https://img.shields.io/badge/build-passing-brightgreen">
-
-<p>Store bot is an amazing and useful thing for your business</p>
+<img alt="GitHub commit activity (branch)" src="https://img.shields.io/github/commit-activity/t/twers1/telegram-bot-shop">
+<img alt="GitHub" src="https://img.shields.io/github/license/twers1/telegram-bot-shop">
+<img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/twers1/telegram-bot-shop">
+<img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/twers1/telegram-bot-shop">
+<p>store bot is an amazing and useful thing for your business</p>
 </div>
 
 # ⚒ Stack 
